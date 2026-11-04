@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-title" content="Poolside">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#e2effc">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest?v=2">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="icon" type="image/png" href="icon-192.png">
 <title>Poolside</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -686,6 +686,12 @@ function slotsModal() {
   };
 }
 function coachName() { return state.settings.coach || "Coach"; }
+function payLine() {
+  const v = String(state.settings.venmo || "").trim(), z = String(state.settings.zelle || "").trim();
+  const zd = z.replace(/\D/g, ""), zs = !/@/.test(z) && zd.length === 10 ? `(${zd.slice(0, 3)}) ${zd.slice(3, 6)}-${zd.slice(6)}` : z;
+  const ways = [v && `Venmo ${v.startsWith("@") ? v : "@" + v}`, z && `Zelle ${zs}`].filter(Boolean);
+  return ways.length ? `\nYou can pay by ${ways.join(" or ")}.` : "";
+}
 async function approveRequest(r) {
   const ex = !!r.example;
   let f = familyForPhone(r.phone);
@@ -695,7 +701,7 @@ async function approveRequest(r) {
   const lid = await store.add("lessons", { swimmerId: sid, date: r.slot_date, time: r.slot_time, length: r.slot_length || 30, status: "booked", note: "", location: r.location || "", example: ex });
   if (r.slot_id && state.slots.some((x) => x.id === r.slot_id)) await book.updateSlot(r.slot_id, { status: "booked" });
   await book.updateRequest(r.id, { status: "approved", lesson_id: lid });
-  const msg = `Hi ${first(r.parent_name)}! ${first(r.child_name)} is booked for a swim lesson on ${longDay(r.slot_date)} at ${fmtTime(r.slot_time)} (${r.slot_length || 30} minutes)${r.location ? ` at ${r.location}` : ""}. See you at the pool!\n– ${coachName()}`;
+  const msg = `Hi ${first(r.parent_name)}! ${first(r.child_name)} is booked for a swim lesson on ${longDay(r.slot_date)} at ${fmtTime(r.slot_time)} (${r.slot_length || 30} minutes)${r.location ? ` at ${r.location}` : ""}. See you at the pool!${payLine()}\n– ${coachName()}`;
   replyModal("Approved", r, msg, f ? "" : `${r.parent_name} and ${first(r.child_name)} were added to Families at Level 1. You can change the level on the Progress tab.`);
 }
 async function declineRequest(r, reopen) {
@@ -724,10 +730,10 @@ function settingsModal() {
     <div class="two"><label class="f">Your name (signs texts and updates)<input id="set-coach" name="coach" value="${esc(state.settings.coach || "")}" placeholder="Clare"></label>
     <label class="f">Business name<input id="set-biz" name="business" value="${esc(state.settings.business || "")}" placeholder="e.g. Clare's Swim School"></label></div>
     <label class="f">About me (shown on your booking page)<textarea id="set-about" name="about" rows="5" maxlength="1500" placeholder="e.g. I'm a swimmer at Duke and have taught kids ages 3 to 12 every summer since 2023. Lessons are one-on-one and focus on water confidence first.">${esc(state.settings.about || "")}</textarea></label>
-    <div class="two"><label class="f">Venmo username<input id="set-venmo" name="venmo" maxlength="60" value="${esc(state.settings.venmo || "")}" placeholder="@yourname"></label>
-    <label class="f">Zelle (phone or email)<input id="set-zelle" name="zelle" maxlength="100" value="${esc(state.settings.zelle || "")}" placeholder="Phone number or email"></label></div>
+    <div class="two"><label class="f">Venmo username (goes in confirmation texts)<input id="set-venmo" name="venmo" maxlength="60" value="${esc(state.settings.venmo || "")}" placeholder="@yourname"></label>
+    <label class="f">Zelle phone or email (goes in confirmation texts)<input id="set-zelle" name="zelle" maxlength="100" value="${esc(state.settings.zelle || "")}" placeholder="Phone number or email"></label></div>
     <label class="f">Prices (shown on your booking page)<textarea id="set-prices" name="prices" rows="3" maxlength="1000" placeholder="Type prices, or paste a table from a spreadsheet or Notes (columns separated by tabs or |)">${esc(state.settings.prices || "")}</textarea></label>
-    <p class="muted" style="margin:0;font-size:13px">Parents see your names, About me, payment options and Prices on your booking page. Leave a box blank to hide it.</p>
+    <p class="muted" style="margin:0;font-size:13px">Parents see your names, About me and Prices on your booking page. Your Venmo and Zelle details only go in the confirmation text you send after approving. Leave a box blank to hide it.</p>
     <div class="acts">${state.mode === "cloud" ? '<button type="button" class="btn ghost left" data-act="sign-out">Sign out</button>' : ""}<button type="button" class="btn ghost" data-act="close">Cancel</button><button class="btn primary">Save</button></div>`);
   $("#mform").onsubmit = async (e) => {
     e.preventDefault(); const v = Object.fromEntries(new FormData(e.target)); closeModal();

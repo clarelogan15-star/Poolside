@@ -92,7 +92,7 @@ const longDay = (s) => parseD(s).toLocaleDateString(undefined, { weekday: "long"
 const CFG = window.POOLSIDE_CONFIG || {};
 const configured = /^https:\/\//.test(CFG.supabaseUrl || "") && String(CFG.supabaseAnonKey || "").length > 20;
 const sb = configured && window.supabase ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: false } }) : null;
-const state = { coach: "", business: "", about: "", prices: "", venmo: "", zelle: "", slots: [], picked: null, sent: null, error: "", busy: false, form: {} };
+const state = { coach: "", business: "", about: "", prices: "", venmo: false, zelle: false, slots: [], picked: null, sent: null, error: "", busy: false, form: {} };
 
 function demoSlots() {
   const out = [], now = new Date();
@@ -104,11 +104,11 @@ function demoSlots() {
   return out;
 }
 async function load() {
-  if (!sb) { Object.assign(state, { coach: "Clare", business: "", venmo: "@yourvenmo", zelle: "(555) 010-0000", prices: "Private swim lessons\nDuration\t1 Child\t2 Children\t3 Children\n30 min\t$60\t$80\t$85\n45 min\t$85\t$115\t$115\n1 hour\t$105\t$150\t$150", about: "Hi! I swim at Duke and have taught summer swim lessons since 2023. Lessons are one-on-one and start with feeling safe and confident in the water.", slots: demoSlots() }); return; }
+  if (!sb) { Object.assign(state, { coach: "Clare", business: "", venmo: true, zelle: true, prices: "Private swim lessons\nDuration\t1 Child\t2 Children\t3 Children\n30 min\t$60\t$80\t$85\n45 min\t$85\t$115\t$115\n1 hour\t$105\t$150\t$150", about: "Hi! I swim at Duke and have taught summer swim lessons since 2023. Lessons are one-on-one and start with feeling safe and confident in the water.", slots: demoSlots() }); return; }
   const { data, error } = await sb.rpc("get_booking_page");
   if (error) throw error;
   const today = ymd(new Date());
-  Object.assign(state, { coach: data.coach || "", business: data.business || "", about: data.about || "", prices: data.prices || "", venmo: data.venmo || "", zelle: data.zelle || "", slots: (data.slots || []).filter((x) => x.date >= today) });
+  Object.assign(state, { coach: data.coach || "", business: data.business || "", about: data.about || "", prices: data.prices || "", venmo: data.venmo === true, zelle: data.zelle === true, slots: (data.slots || []).filter((x) => x.date >= today) });
 }
 
 // Prices: lines pasted from a spreadsheet (cells split by tabs, or by " | ") become a table; other lines stay text.
@@ -152,13 +152,8 @@ function render() {
   const f = state.form;
   const about = state.about ? `<section class="card about"><img class="me" src="photo.jpg" alt="${esc(state.coach || "Your coach")} at the U.S. Olympic Team Trials" width="596" height="799" onerror="this.remove()"><div class="abouttext"><h2>About ${esc(state.coach || "me")}</h2>${state.about.split(/\n\s*\n/).map((para) => `<p>${esc(para.trim()).replace(/\n/g, "<br>")}</p>`).join("")}</div></section>` : "";
   const paras = (t) => t.split(/\n\s*\n/).map((para) => `<p>${esc(para.trim()).replace(/\n/g, "<br>")}</p>`).join("");
-  const vUser = String(state.venmo || "").replace(/^@/, "").replace(/[^A-Za-z0-9_-]/g, "");
-  const zDigits = String(state.zelle || "").replace(/\D/g, "");
-  const zShow = /@/.test(state.zelle) ? state.zelle : zDigits.length === 10 ? `(${zDigits.slice(0, 3)}) ${zDigits.slice(3, 6)}-${zDigits.slice(6)}` : state.zelle;
-  const pay = vUser || state.zelle ? `<div class="pay"><h3>How to pay</h3>
-    ${vUser ? `<a class="payopt" href="https://venmo.com/u/${encodeURIComponent(vUser)}" target="_blank" rel="noopener"><b>Venmo</b><span>@${esc(vUser)}</span></a>` : ""}
-    ${state.zelle ? `<div class="payopt"><b>Zelle</b><span>${esc(zShow)}</span></div>` : ""}
-    <p class="muted">Please pay after ${esc(state.coach || "your coach")} confirms your lesson.</p></div>` : "";
+  const ways = [state.venmo && "Venmo", state.zelle && "Zelle"].filter(Boolean).join(" or ");
+  const pay = ways ? `<div class="pay"><h3>How to pay</h3><p class="muted">Pay by ${ways} after ${esc(state.coach || "your coach")} confirms your lesson. Payment details come with the confirmation text.</p></div>` : "";
   const prices = state.prices || pay ? `<section class="card prices">${state.prices ? `<h2>Prices</h2>${priceBlocks(state.prices)}` : ""}${pay}</section>` : "";
   $("#app").innerHTML = `${demo}${about}${prices}
     <p class="intro">Choose a time. ${esc(state.coach || "Your coach")} will text you to confirm.</p>

@@ -71,8 +71,9 @@ language sql stable security definer set search_path = public as $$
   select jsonb_build_object(
     'coach', coalesce((select data ->> 'coach' from records where collection = 'settings' and id = 'main'), ''),
     'business', coalesce((select data ->> 'business' from records where collection = 'settings' and id = 'main'), ''),
-    'venmo', coalesce((select left(data ->> 'venmo', 60) from records where collection = 'settings' and id = 'main'), ''),
-    'zelle', coalesce((select left(data ->> 'zelle', 100) from records where collection = 'settings' and id = 'main'), ''),
+    -- Only whether Venmo / Zelle are set up. The usernames go in the confirmation text, not on the public page.
+    'venmo', coalesce((select coalesce(data ->> 'venmo', '') <> '' from records where collection = 'settings' and id = 'main'), false),
+    'zelle', coalesce((select coalesce(data ->> 'zelle', '') <> '' from records where collection = 'settings' and id = 'main'), false),
     'prices', coalesce((select left(data ->> 'prices', 1500) from records where collection = 'settings' and id = 'main'), ''),
     'about', coalesce((select left(data ->> 'about', 2000) from records where collection = 'settings' and id = 'main'), ''),
     'slots', coalesce((
