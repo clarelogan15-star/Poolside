@@ -265,7 +265,7 @@ const byTime = (a, b) => (a.date + a.time).localeCompare(b.date + b.time);
 
 /* ---------- state ---------- */
 const state = {
-  tab: "schedule", families: [], swimmers: [], lessons: [], updates: [], settings: { coach: "", business: "", about: "", prices: "" },
+  tab: "schedule", families: [], swimmers: [], lessons: [], updates: [], settings: { coach: "", business: "", about: "", prices: "", venmo: "", zelle: "" },
   week: mondayOf(new Date()), weekChosen: false, sel: null, q: "", draft: null, mode: "loading",
   tone: "warm", extra: "", busy: false, batch: null, confirm: null, notesBuf: {},
   plans: [], feedback: [], slots: [], requests: [], signup: false, loginError: "", planSel: null, planDraft: null, planFocus: "", planBusy: false, planBatch: null, vid: null, vfocus: "",
@@ -724,12 +724,14 @@ function settingsModal() {
     <div class="two"><label class="f">Your name (signs texts and updates)<input id="set-coach" name="coach" value="${esc(state.settings.coach || "")}" placeholder="Clare"></label>
     <label class="f">Business name<input id="set-biz" name="business" value="${esc(state.settings.business || "")}" placeholder="e.g. Clare's Swim School"></label></div>
     <label class="f">About me (shown on your booking page)<textarea id="set-about" name="about" rows="5" maxlength="1500" placeholder="e.g. I'm a swimmer at Duke and have taught kids ages 3 to 12 every summer since 2023. Lessons are one-on-one and focus on water confidence first.">${esc(state.settings.about || "")}</textarea></label>
+    <div class="two"><label class="f">Venmo username<input id="set-venmo" name="venmo" maxlength="60" value="${esc(state.settings.venmo || "")}" placeholder="@yourname"></label>
+    <label class="f">Zelle (phone or email)<input id="set-zelle" name="zelle" maxlength="100" value="${esc(state.settings.zelle || "")}" placeholder="Phone number or email"></label></div>
     <label class="f">Prices (shown on your booking page)<textarea id="set-prices" name="prices" rows="3" maxlength="1000" placeholder="Type prices, or paste a table from a spreadsheet or Notes (columns separated by tabs or |)">${esc(state.settings.prices || "")}</textarea></label>
-    <p class="muted" style="margin:0;font-size:13px">Parents see your names, About me and Prices on your booking page. Leave a box blank to hide it.</p>
+    <p class="muted" style="margin:0;font-size:13px">Parents see your names, About me, payment options and Prices on your booking page. Leave a box blank to hide it.</p>
     <div class="acts">${state.mode === "cloud" ? '<button type="button" class="btn ghost left" data-act="sign-out">Sign out</button>' : ""}<button type="button" class="btn ghost" data-act="close">Cancel</button><button class="btn primary">Save</button></div>`);
   $("#mform").onsubmit = async (e) => {
     e.preventDefault(); const v = Object.fromEntries(new FormData(e.target)); closeModal();
-    try { await saveSettings({ coach: v.coach.trim(), business: v.business.trim(), about: (v.about || "").trim(), prices: (v.prices || "").trim() }); toast("Saved."); } catch (err) { toast("Couldn't save. Check your connection and try again."); }
+    try { await saveSettings({ coach: v.coach.trim(), business: v.business.trim(), about: (v.about || "").trim(), prices: (v.prices || "").trim(), venmo: (v.venmo || "").trim(), zelle: (v.zelle || "").trim() }); toast("Saved."); } catch (err) { toast("Couldn't save. Check your connection and try again."); }
   };
 }
 
