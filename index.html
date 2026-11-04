@@ -1,0 +1,1421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Poolside">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0a7285">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>Poolside</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Figtree:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: one working surface under a lane-rope header; tabs for Schedule, Families, Progress, Updates. */
+:root {
+  --bg: #edf4f4; --surface: #ffffff; --sunk: #e3eeef; --ink: #0f2b33; --muted: #52707a; --line: #cfe0e2;
+  --accent: #0a7285; --accent-ink: #ffffff; --accent-soft: #d6eef1;
+  --rope: #dd4f37; --sun: #e3a316; --sun-soft: #fbefd2; --good: #23845a; --good-soft: #d9f0e4;
+  --l1: #c4eef3; --l1-ink: #0f3a42; --l2: #8bd7e1; --l2-ink: #0f3a42; --l3: #3fb2c4; --l3-ink: #06272d;
+  --l4: #1c7d95; --l4-ink: #ffffff; --l5: #17476a; --l5-ink: #ffffff;
+  --display: "Familjen Grotesk", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0b1a1f; --surface: #11252c; --sunk: #0e2027; --ink: #e2eff1; --muted: #8eabb2; --line: #23424b;
+  --accent: #43c3d5; --accent-ink: #032329; --accent-soft: #143a43;
+  --rope: #f07a62; --sun: #f2c14e; --sun-soft: #3a3016; --good: #5cc98b; --good-soft: #15372a; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0b1a1f; --surface: #11252c; --sunk: #0e2027; --ink: #e2eff1; --muted: #8eabb2; --line: #23424b;
+  --accent: #43c3d5; --accent-ink: #032329; --accent-soft: #143a43;
+  --rope: #f07a62; --sun: #f2c14e; --sun-soft: #3a3016; --good: #5cc98b; --good-soft: #15372a; color-scheme: dark }
+
+* { box-sizing: border-box; }
+html { color-scheme: light; -webkit-text-size-adjust: 100%; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; min-height: 100vh; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+header.top { background: var(--surface); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding-block: 14px 0; }
+.brand { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.brand h1 { font-size: 24px; letter-spacing: -0.01em; }
+.brand span { color: var(--muted); font-size: 13px; }
+nav.tabs { display: flex; gap: 4px; margin-left: auto; overflow-x: auto; }
+nav.tabs button { border: 0; background: none; padding: 10px 14px 12px; font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--muted); border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; }
+nav.tabs button[aria-current="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+nav.tabs button:hover { color: var(--ink); }
+.rope { height: 6px; background: repeating-linear-gradient(90deg, var(--rope) 0 14px, #ffffff 14px 18px, var(--accent) 18px 32px, #ffffff 32px 36px); opacity: .9; }
+
+main { padding-block: 22px 60px; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; }
+.bar h2 { font-size: 22px; margin-right: auto; }
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 14px; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.ghost { background: none; border-color: transparent; color: var(--muted); }
+.btn.ghost:hover { color: var(--ink); }
+.btn.danger { color: var(--rope); }
+.btn.small { padding: 4px 10px; font-size: 13px; }
+.btn:disabled { opacity: .5; cursor: default; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.notice { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; background: var(--sun-soft); border: 1px solid color-mix(in srgb, var(--sun) 45%, transparent); padding: 10px 14px; border-radius: var(--r); margin-bottom: 16px; font-size: 14px; }
+.notice span { flex: 1 1 280px; }
+.ex { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: var(--muted); border: 1px dashed var(--muted); border-radius: 4px; padding: 0 5px; }
+.muted { color: var(--muted); }
+.lvl { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 99px; white-space: nowrap; }
+.lvl.l1 { background: var(--l1); color: var(--l1-ink); } .lvl.l2 { background: var(--l2); color: var(--l2-ink); }
+.lvl.l3 { background: var(--l3); color: var(--l3-ink); } .lvl.l4 { background: var(--l4); color: var(--l4-ink); }
+.lvl.l5 { background: var(--l5); color: var(--l5-ink); }
+
+/* Schedule */
+.week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.day { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); min-height: 150px; display: flex; flex-direction: column; min-width: 0; }
+.day.today { border-color: var(--accent); box-shadow: inset 0 3px 0 var(--accent); }
+.day h3 { font-size: 14px; padding: 10px 10px 6px; display: flex; justify-content: space-between; gap: 6px; }
+.day h3 small { font-family: var(--body); font-weight: 400; color: var(--muted); }
+.slots { display: flex; flex-direction: column; gap: 6px; padding: 0 8px 10px; }
+.lesson { text-align: left; border: 1px solid var(--line); background: var(--sunk); border-radius: 8px; padding: 6px 8px; cursor: pointer; display: grid; gap: 1px; border-left: 4px solid var(--accent); min-width: 0; }
+.lesson:hover { border-color: var(--accent); }
+.lesson b { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lesson .t { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lesson.done { border-left-color: var(--good); }
+.lesson.cancelled { border-left-color: var(--muted); opacity: .6; }
+.lesson.cancelled b { text-decoration: line-through; }
+.lesson.clash { border-left-color: var(--rope); }
+.addday { margin-top: auto; border: 1px dashed var(--line); background: none; border-radius: 8px; color: var(--muted); font-size: 13px; padding: 4px; cursor: pointer; margin: auto 8px 8px; }
+.addday:hover { color: var(--accent); border-color: var(--accent); }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-bottom: 14px; font-size: 14px; color: var(--muted); }
+.stats b { color: var(--ink); font-family: var(--display); font-size: 18px; margin-right: 4px; font-variant-numeric: tabular-nums; }
+@media (max-width: 860px) { .week { grid-template-columns: 1fr; } .day { min-height: 0; } .addday { margin-top: 4px; } }
+
+/* Families */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card h3 { font-size: 18px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.contact { display: grid; gap: 2px; font-size: 14px; }
+.contact .sel { user-select: all; font-variant-numeric: tabular-nums; }
+.kid { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; padding: 8px 10px; background: var(--sunk); border-radius: 8px; cursor: pointer; border: 1px solid transparent; text-align: left; width: 100%; }
+.kid:hover { border-color: var(--accent); }
+.meter { grid-column: 1 / -1; height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+.row { display: flex; flex-wrap: wrap; gap: 6px; }
+.search { padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); min-width: 0; width: 220px; max-width: 100%; }
+
+/* Two-pane (progress, updates) */
+.split { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 760px) { .split { grid-template-columns: 1fr; } }
+.list { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 8px; display: flex; flex-direction: column; gap: 2px; max-height: 70vh; overflow: auto; }
+.list .search { width: 100%; margin-bottom: 6px; }
+.pick { display: flex; justify-content: space-between; align-items: center; gap: 8px; text-align: left; border: 0; background: none; padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+.pick:hover { background: var(--sunk); }
+.pick[aria-current="true"] { background: var(--accent-soft); }
+.pick small { color: var(--muted); display: block; font-size: 12px; }
+.pane { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px 20px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.pane h2 { font-size: 26px; }
+.levelblock { border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.levelblock > header { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 12px; background: var(--sunk); cursor: pointer; }
+.levelblock > header h3 { font-size: 15px; margin-right: auto; }
+.skills { display: grid; }
+.skill { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-top: 1px solid var(--line); border-left: 0; border-right: 0; border-bottom: 0; background: none; text-align: left; cursor: pointer; width: 100%; }
+.skill:hover { background: var(--sunk); }
+.skill .dot { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+.skill.working .dot { border-color: var(--sun); background: var(--sun-soft); color: var(--sun); }
+.skill.got .dot { border-color: var(--good); background: var(--good); color: var(--surface); }
+.skill .st { margin-left: auto; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
+label.f { display: grid; gap: 4px; font-size: 13px; font-weight: 700; color: var(--muted); }
+label.f input, label.f select, label.f textarea, textarea.big { font-weight: 400; color: var(--ink); padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); width: 100%; min-width: 0; }
+textarea.big { min-height: 190px; line-height: 1.55; resize: vertical; font-size: 15px; }
+.history { display: grid; gap: 6px; font-size: 14px; }
+.history div { display: flex; gap: 10px; flex-wrap: wrap; }
+.history time { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 92px; }
+.pill { font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 99px; background: var(--sunk); color: var(--muted); }
+.pill.good { background: var(--good-soft); color: var(--good); }
+.pill.sun { background: var(--sun-soft); color: var(--sun); }
+.empty { text-align: center; padding: 40px 16px; color: var(--muted); }
+.empty h3 { color: var(--ink); margin-bottom: 6px; font-size: 18px; }
+.sparkle { font-weight: 700; }
+.draftcard { border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 8px; }
+.draftcard p { margin: 0; white-space: pre-wrap; }
+
+/* Modal */
+.scrim { position: fixed; inset: 0; background: color-mix(in srgb, var(--ink) 45%, transparent); display: grid; place-items: center; padding: 16px; z-index: 20; }
+.modal { background: var(--surface); border-radius: 14px; width: min(560px, 100%); max-height: 90vh; overflow: auto; padding: 20px; display: grid; gap: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+.modal h2 { font-size: 21px; }
+.modal .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 480px) { .modal .two { grid-template-columns: 1fr; } }
+.modal .acts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.modal .acts .left { margin-right: auto; }
+.warn { color: var(--rope); font-size: 14px; font-weight: 700; }
+.textcard { border: 1px solid var(--line); border-radius: var(--r); padding: 12px; display: grid; gap: 8px; }
+.textcard header { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.textcard pre { margin: 0; white-space: pre-wrap; font-family: var(--body); font-size: 14px; background: var(--sunk); padding: 10px; border-radius: 8px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 8px; font-size: 14px; z-index: 30; }
+@media (prefers-reduced-motion: no-preference) { .modal { animation: rise .16s ease-out; } @keyframes rise { from { transform: translateY(8px); opacity: .6; } } }
+/* Lesson plans + video feedback */
+.dayhead { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; padding: 10px 10px 2px; }
+textarea.plan { min-height: 230px; font-variant-numeric: tabular-nums; }
+.notice.honest { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
+.vh { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none; }
+.filebtn { position: relative; display: inline-flex; align-items: center; }
+.filebtn:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.frames { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+.frames figure { margin: 0; display: grid; gap: 2px; min-width: 0; }
+.frames img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 6px; display: block; background: var(--sunk); }
+.frames figcaption { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fb { display: grid; gap: 12px; border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; }
+.fb p { margin: 0; }
+.fb h4 { margin: 0 0 4px; font-family: var(--display); font-size: 14px; }
+.fb ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.sugg { display: grid; gap: 8px; }
+.sg { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--sunk); border-radius: 8px; }
+.sg > span:first-child { flex: 1 1 220px; min-width: 0; }
+.past { border-top: 1px solid var(--line); padding: 8px 0; }
+.past summary { cursor: pointer; font-size: 14px; }
+.past .fb { margin-top: 8px; }
+/* Standalone app: sign-in, booking */
+.login { max-width: 420px; margin: 40px auto; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; display: grid; gap: 14px; }
+.login h2 { font-size: 24px; }
+.login p { margin: 0; }
+.loginform { display: grid; gap: 12px; }
+.topacts { display: flex; gap: 6px; align-items: center; }
+.sharebox { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 8px; margin-bottom: 20px; }
+.sharebox code { font-size: 14px; background: var(--sunk); padding: 6px 10px; border-radius: 6px; overflow-wrap: anywhere; user-select: all; }
+.section-h { font-size: 18px; margin: 22px 0 10px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.section-h small { font-family: var(--body); font-weight: 400; color: var(--muted); font-size: 14px; }
+.reqs { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.req .when { font-family: var(--display); font-weight: 600; font-size: 16px; }
+.slotdays { display: grid; gap: 10px; }
+.slotday { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 12px 12px; }
+.slotday .dayhead { padding-left: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 99px; padding: 3px 4px 3px 12px; font-size: 14px; font-variant-numeric: tabular-nums; background: var(--sunk); }
+.chip.held { background: var(--sun-soft); border-color: color-mix(in srgb, var(--sun) 45%, transparent); padding-right: 12px; }
+.chip.booked { background: var(--good-soft); border-color: color-mix(in srgb, var(--good) 40%, transparent); padding-right: 12px; }
+.chip button { border: 0; background: none; cursor: pointer; color: var(--muted); font-size: 16px; line-height: 1; width: 24px; height: 24px; border-radius: 50%; }
+.chip button:hover { background: var(--line); color: var(--ink); }
+.chip small { color: var(--muted); }
+a.btn { text-decoration: none; color: inherit; display: inline-block; }
+</style>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><h1>Poolside</h1><span id="sub">Swim lesson manager</span><button class="btn ghost small" id="settings-btn" data-act="settings" hidden>Settings</button></div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="schedule">Schedule</button>
+      <button data-tab="booking" id="tab-booking">Booking</button>
+      <button data-tab="families">Families</button>
+      <button data-tab="progress">Progress</button>
+      <button data-tab="plans">Lesson plans</button>
+      <button data-tab="video">Video feedback</button>
+      <button data-tab="updates">Parent updates</button>
+    </nav>
+  </div>
+  <div class="rope"></div>
+</header>
+<main class="wrap" id="app"><div class="empty"><h3>Loading…</h3></div></main>
+<div id="modal"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+/* ---------- skill levels ---------- */
+const LEVELS = [
+  { n: 1, name: "Water Comfort", skills: ["Enters and exits the pool safely", "Blows bubbles", "Puts whole face in the water", "Floats on front with support"] },
+  { n: 2, name: "Floating & Gliding", skills: ["Floats on back alone for 10 seconds", "Front glide for 2 body lengths", "Flutter kick with a kickboard", "Rolls from front to back"] },
+  { n: 3, name: "First Strokes", skills: ["Front crawl arms for 5 meters", "Side breathing with support", "Back kick for 10 meters", "Treads water for 30 seconds"] },
+  { n: 4, name: "Stroke Builder", skills: ["Front crawl 15 meters with side breathing", "Backstroke 15 meters", "Breaststroke kick", "Dives in from sitting"] },
+  { n: 5, name: "Confident Swimmer", skills: ["Front crawl 25 meters", "Backstroke 25 meters", "Breaststroke 15 meters", "Treads water for 2 minutes"] },
+];
+const skillKey = (n, i) => `l${n}s${i}`;
+const STATUS = { no: "Not yet", working: "Working on it", got: "Got it" };
+const NEXT = { no: "working", working: "got", got: "no" };
+
+/* ---------- helpers ---------- */
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pad = (n) => String(n).padStart(2, "0");
+const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseD = (s) => { const [y, m, d] = String(s).split("-").map(Number); return new Date(y, m - 1, d); };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const mondayOf = (d) => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); return addDays(x, -((x.getDay() + 6) % 7)); };
+const fmtTime = (t) => { let [h, m] = String(t || "0:0").split(":").map(Number); const ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12; return `${h}:${pad(m)} ${ap}`; };
+const fmtDay = (s, o = { weekday: "short", month: "short", day: "numeric" }) => parseD(s).toLocaleDateString(undefined, o);
+const today = () => ymd(new Date());
+const first = (s) => String(s || "").trim().split(/\s+/)[0] || "";
+const byTime = (a, b) => (a.date + a.time).localeCompare(b.date + b.time);
+
+/* ---------- state ---------- */
+const state = {
+  tab: "schedule", families: [], swimmers: [], lessons: [], updates: [], settings: { coach: "", business: "" },
+  week: mondayOf(new Date()), weekChosen: false, sel: null, q: "", draft: null, mode: "loading",
+  tone: "warm", extra: "", busy: false, batch: null, confirm: null, notesBuf: {},
+  plans: [], feedback: [], slots: [], requests: [], signup: false, loginError: "", planSel: null, planDraft: null, planFocus: "", planBusy: false, planBatch: null, vid: null, vfocus: "",
+};
+let db = null, sample = null, sampleTried = false;
+
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => (t.hidden = true), 2600); }
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); toast("Copied. Paste it into your text app."); }
+  catch (e) { toast("Couldn't copy automatically. Select the text and copy it."); }
+}
+
+/* ---------- storage: Supabase when set up, otherwise example data in this browser only ---------- */
+const CFG = window.POOLSIDE_CONFIG || {};
+const configured = /^https:\/\//.test(CFG.supabaseUrl || "") && String(CFG.supabaseAnonKey || "").length > 20;
+let sb = null;
+const COLS = ["families", "swimmers", "lessons", "updates", "plans", "feedback"];
+const newId = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : "x" + Date.now().toString(36) + Math.random().toString(36).slice(2));
+async function remote(q) { const { error } = await q; if (error) throw error; }
+function applyLocal(col, id, data) { state[col] = state[col].filter((x) => x.id !== id); if (data) state[col].push({ id, ...data }); }
+const store = {
+  async add(col, data) { const id = newId(); await this.set(col, id, { ...data, createdAt: Date.now() }); return id; },
+  async set(col, id, data) {
+    if (sb) await remote(sb.from("records").upsert({ collection: col, id, data, updated_at: new Date().toISOString() }));
+    applyLocal(col, id, data); render();
+  },
+  async setMany(col, items) {
+    if (!items.length) return;
+    if (sb) await remote(sb.from("records").upsert(items.map(({ id, ...data }) => ({ collection: col, id, data, updated_at: new Date().toISOString() }))));
+    for (const { id, ...data } of items) applyLocal(col, id, data);
+    render();
+  },
+  async update(col, id, patch) {
+    const cur = state[col].find((x) => x.id === id); if (!cur) return;
+    const { id: _ignore, ...rest } = cur;
+    await this.set(col, id, { ...rest, ...patch });
+  },
+  async del(col, id) {
+    if (sb) await remote(sb.from("records").delete().eq("collection", col).eq("id", id));
+    applyLocal(col, id, null); render();
+  },
+};
+const book = {
+  async addSlots(rows) {
+    if (!rows.length) return;
+    if (sb) await remote(sb.from("slots").insert(rows));
+    state.slots.push(...rows); render();
+  },
+  async updateSlot(id, patch) {
+    if (sb) await remote(sb.from("slots").update(patch).eq("id", id));
+    const x = state.slots.find((y) => y.id === id); if (x) Object.assign(x, patch); render();
+  },
+  async delSlot(id) {
+    if (sb) await remote(sb.from("slots").delete().eq("id", id));
+    state.slots = state.slots.filter((y) => y.id !== id); render();
+  },
+  async updateRequest(id, patch) {
+    if (sb) await remote(sb.from("booking_requests").update(patch).eq("id", id));
+    const x = state.requests.find((y) => y.id === id); if (x) Object.assign(x, patch); render();
+  },
+};
+async function saveSettings(patch) {
+  const data = { ...state.settings, ...patch };
+  if (sb) await remote(sb.from("records").upsert({ collection: "settings", id: "main", data, updated_at: new Date().toISOString() }));
+  state.settings = data; render();
+}
+async function selectAll(table, cols) {
+  const rows = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await sb.from(table).select(cols).range(from, from + 999);
+    if (error) throw error;
+    rows.push(...data); if (data.length < 1000) return rows;
+  }
+}
+async function loadAll() {
+  const [recs, slots, reqs] = await Promise.all([selectAll("records", "collection,id,data"), selectAll("slots", "*"), selectAll("booking_requests", "*")]);
+  const by = Object.fromEntries(COLS.map((c) => [c, []]));
+  for (const r of recs) {
+    if (r.collection === "settings") { if (r.id === "main") state.settings = { ...state.settings, ...r.data }; }
+    else if (by[r.collection]) by[r.collection].push({ id: r.id, ...r.data });
+  }
+  Object.assign(state, by); state.slots = slots; state.requests = reqs;
+}
+async function refreshBooking() {
+  if (!sb || state.mode !== "cloud") return;
+  try {
+    const [slots, reqs] = await Promise.all([selectAll("slots", "*"), selectAll("booking_requests", "*")]);
+    const before = JSON.stringify([state.slots, state.requests].map((a) => a.map((x) => x.id + x.status).sort()));
+    const after = JSON.stringify([slots, reqs].map((a) => a.map((x) => x.id + x.status).sort()));
+    if (before === after) return;
+    state.slots = slots; state.requests = reqs;
+    if (!$("#modal").innerHTML) render();
+  } catch (e) { /* try again on the next refresh */ }
+}
+
+/* ---------- AI: calls the Supabase "claude" function, which holds the Anthropic key ---------- */
+const blobToB64 = (b) => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.onerror = () => rej(r.error); r.readAsDataURL(b); });
+function parseLooseJson(t) {
+  try { return JSON.parse(t); } catch (e) {}
+  const m = /```(?:json)?\s*([\s\S]*?)```/.exec(t); if (m) { try { return JSON.parse(m[1]); } catch (e) {} }
+  const a = t.indexOf("{"), b = t.lastIndexOf("}"); if (a >= 0 && b > a) { try { return JSON.parse(t.slice(a, b + 1)); } catch (e) {} }
+  throw { code: "invalid_json", text: t };
+}
+function makeSample() {
+  async function call(prompt, opts, wantJson) {
+    if (opts.signal && opts.signal.aborted) throw { code: "cancelled" };
+    const images = opts.images ? await Promise.all([...opts.images].map(blobToB64)) : [];
+    const { data, error } = await sb.functions.invoke("claude", { body: { prompt, images, json: !!wantJson } });
+    if (opts.signal && opts.signal.aborted) throw { code: "cancelled" };
+    if (error) {
+      let code = "offline";
+      try { const b = await error.context.json(); if (b && b.error) code = b.error; } catch (e) {}
+      throw { code, message: String(error.message || code) };
+    }
+    if (!data || typeof data.text !== "string") throw { code: "busy" };
+    return data.text;
+  }
+  const fn = async (prompt, opts = {}) => { const text = await call(prompt, opts, false); if (opts.onText) opts.onText({ text, delta: text }); return { text, truncated: false }; };
+  fn.json = async (prompt, opts = {}) => parseLooseJson(await call(prompt, opts, true));
+  fn.limits = async () => ({ maxPromptBytes: 100000, images: { maxCount: 8, maxInputBytes: 20000000, mediaTypes: ["image/jpeg"] } });
+  return fn;
+}
+
+const fam = (id) => state.families.find((f) => f.id === id);
+const swimmer = (id) => state.swimmers.find((s) => s.id === id);
+const kidsOf = (fid) => state.swimmers.filter((s) => s.familyId === fid).sort((a, b) => a.name.localeCompare(b.name));
+const lessonsOf = (sid) => state.lessons.filter((l) => l.swimmerId === sid).sort(byTime);
+const skillsOf = (s) => s.skills || {};
+function levelProgress(s, n = s.level || 1) {
+  const L = LEVELS[n - 1]; const sk = skillsOf(s);
+  const got = L.skills.filter((_, i) => sk[skillKey(n, i)] === "got").length;
+  return { got, total: L.skills.length, pct: Math.round((got / L.skills.length) * 100) };
+}
+const lvlChip = (n) => `<span class="lvl l${n}">Level ${n}</span>`;
+
+/* ---------- render ---------- */
+function render() {
+  document.querySelectorAll("#tabs button").forEach((b) => b.setAttribute("aria-current", String(b.dataset.tab === state.tab)));
+  $("#sub").textContent = state.settings.business || "Swim lesson manager";
+  const ready = state.mode === "cloud" || state.mode === "local";
+  $("#tabs").hidden = !ready; $("#settings-btn").hidden = !ready;
+  const n = state.requests.filter((r) => r.status === "pending").length;
+  $("#tab-booking").textContent = n ? `Booking (${n})` : "Booking";
+  if (state.mode === "loading") { $("#app").innerHTML = '<div class="empty"><h3>Loading your lessons…</h3></div>'; return; }
+  if (state.mode === "signedout") { $("#app").innerHTML = viewLogin(); return; }
+  if (state.mode === "notcoach") { $("#app").innerHTML = viewNotCoach(); return; }
+  if (state.mode === "error") { $("#app").innerHTML = `<div class="empty"><h3>Couldn't load your data</h3>${esc(state.loadError || "")}<p><button class="btn" data-act="reload">Try again</button></p></div>`; return; }
+  const views = { schedule: viewSchedule, booking: viewBooking, families: viewFamilies, progress: viewProgress, plans: viewPlans, video: viewVideo, updates: viewUpdates };
+  const active = document.activeElement; const keepId = active && active.id; const pos = active && active.selectionStart;
+  $("#app").innerHTML = examplesNotice() + views[state.tab]();
+  if (keepId && document.getElementById(keepId)) { const el = document.getElementById(keepId); el.focus(); try { if (pos != null) el.setSelectionRange(pos, pos); } catch (e) {} }
+}
+
+function examplesNotice() {
+  let out = "";
+  if (state.mode === "local") out += `<div class="notice"><span>Demo mode: this copy isn't connected to your database yet, so you're seeing example data and nothing is saved. It switches over once the setup guide is finished.</span></div>`;
+  const hasEx = state.families.some((f) => f.example) || state.slots.some((x) => x.example);
+  if (state.mode === "cloud" && hasEx) out += `<div class="notice"><span>Anything marked <span class="ex">Example</span> is made-up practice data. Try things out, then remove it before adding your real families.</span><button class="btn small" data-act="reset-examples">Move example dates to this week</button><button class="btn small" data-act="clear-examples">${state.confirm === "clear" ? "Click again to remove" : "Remove examples"}</button></div>`;
+  if (state.mode === "cloud" && !state.families.length) out += `<div class="notice"><span>No families yet. Add your first family on the Families tab, or load a few made-up families to practice with.</span><button class="btn small" data-act="load-examples">Load example families</button></div>`;
+  return out;
+}
+
+/* Schedule */
+function viewSchedule() {
+  const start = state.week, days = [...Array(7)].map((_, i) => ymd(addDays(start, i)));
+  const inWeek = state.lessons.filter((l) => l.date >= days[0] && l.date <= days[6]);
+  const active = inWeek.filter((l) => l.status !== "cancelled");
+  const famIds = new Set(active.map((l) => swimmer(l.swimmerId)?.familyId).filter(Boolean));
+  const clashKey = {}; active.forEach((l) => (clashKey[l.date + l.time] = (clashKey[l.date + l.time] || 0) + 1));
+  const label = `${fmtDay(days[0], { month: "short", day: "numeric" })} – ${fmtDay(days[6], { month: "short", day: "numeric", year: "numeric" })}`;
+  const upcoming = state.lessons.filter((l) => l.date > days[6]).sort(byTime)[0];
+  const past = state.lessons.filter((l) => l.date < days[0]).sort(byTime).pop();
+  const t = today();
+  return `
+  <div class="bar">
+    <h2>Week of ${esc(label)}</h2>
+    <button class="btn" data-act="week" data-d="-7" aria-label="Previous week">‹ Prev</button>
+    <button class="btn" data-act="week" data-d="0">This week</button>
+    <button class="btn" data-act="week" data-d="7" aria-label="Next week">Next ›</button>
+    <button class="btn" data-act="texts" ${famIds.size ? "" : "disabled"}>Write schedule texts</button>
+    <button class="btn primary" data-act="new-lesson">Book a lesson</button>
+  </div>
+  <div class="stats">
+    <span><b>${active.length}</b>lessons</span>
+    <span><b>${famIds.size}</b>families</span>
+    <span><b>${active.filter((l) => l.status === "done").length}</b>taught</span>
+    <span><b>${Object.values(clashKey).filter((n) => n > 1).length}</b>double-booked times</span>
+  </div>
+  ${!inWeek.length && (upcoming || past) ? `<div class="notice"><span>No lessons this week.</span>${upcoming ? `<button class="btn small" data-act="jump" data-date="${upcoming.date}">Go to next lessons (${esc(fmtDay(upcoming.date))})</button>` : ""}${past ? `<button class="btn small" data-act="jump" data-date="${past.date}">Go to most recent (${esc(fmtDay(past.date))})</button>` : ""}</div>` : ""}
+  <div class="week">
+    ${days.map((d) => {
+      const ls = inWeek.filter((l) => l.date === d).sort(byTime);
+      return `<section class="day ${d === t ? "today" : ""}"><h3>${esc(fmtDay(d, { weekday: "short" }))} <small>${esc(fmtDay(d, { month: "short", day: "numeric" }))}</small></h3>
+      <div class="slots">${ls.map((l) => {
+        const s = swimmer(l.swimmerId); const clash = l.status !== "cancelled" && clashKey[l.date + l.time] > 1;
+        return `<button class="lesson ${l.status || "booked"} ${clash ? "clash" : ""}" data-act="lesson" data-id="${l.id}">
+          <span class="t">${esc(fmtTime(l.time))} · ${l.length || 30} min${l.status === "done" ? " · taught" : ""}${clash ? " · double-booked" : ""}${planFor(l.id) ? " · planned" : ""}</span>
+          <b>${esc(s ? s.name : "Unknown swimmer")}</b>
+          ${s ? `<span>${lvlChip(s.level || 1)}</span>` : ""}
+        </button>`; }).join("")}</div>
+      <button class="addday" data-act="new-lesson" data-date="${d}">+ Book</button></section>`;
+    }).join("")}
+  </div>`;
+}
+
+/* Families */
+function viewFamilies() {
+  const q = state.q.toLowerCase();
+  const list = state.families.filter((f) => !q || [f.parent, f.phone, f.email, ...kidsOf(f.id).map((k) => k.name)].join(" ").toLowerCase().includes(q))
+    .sort((a, b) => a.parent.localeCompare(b.parent));
+  return `
+  <div class="bar">
+    <h2>${state.families.length} ${state.families.length === 1 ? "family" : "families"}, ${state.swimmers.length} swimmers</h2>
+    <input class="search" id="q-fam" placeholder="Search names or numbers" value="${esc(state.q)}" data-input="q">
+    <button class="btn primary" data-act="new-family">Add a family</button>
+  </div>
+  ${list.length ? `<div class="grid">${list.map((f) => `
+    <article class="card">
+      <h3>${esc(f.parent)} ${f.example ? '<span class="ex">Example</span>' : ""}</h3>
+      <div class="contact">
+        ${f.phone ? `<span>Phone <span class="sel">${esc(f.phone)}</span></span>` : ""}
+        ${f.email ? `<span>Email <span class="sel">${esc(f.email)}</span></span>` : ""}
+        ${f.notes ? `<span class="muted">${esc(f.notes)}</span>` : ""}
+      </div>
+      ${kidsOf(f.id).map((k) => { const p = levelProgress(k); return `
+        <button class="kid" data-act="open-swimmer" data-id="${k.id}">
+          <span><b>${esc(k.name)}</b> <span class="muted">${k.age ? `age ${esc(k.age)}` : ""}</span></span>
+          ${lvlChip(k.level || 1)}
+          <span class="meter" title="${p.got} of ${p.total} skills in this level"><i style="width:${p.pct}%"></i></span>
+        </button>`; }).join("")}
+      <div class="row">
+        <button class="btn small" data-act="new-swimmer" data-fid="${f.id}">Add swimmer</button>
+        <button class="btn small" data-act="edit-family" data-id="${f.id}">Edit</button>
+      </div>
+    </article>`).join("")}</div>`
+    : `<div class="empty"><h3>${q ? "No matches" : "No families yet"}</h3>${q ? "Try a different name." : "Add a family to start booking lessons."}</div>`}`;
+}
+
+function swimmerList(extra = () => "") {
+  const q = state.q.toLowerCase();
+  const list = state.swimmers.filter((s) => !q || (s.name + " " + (fam(s.familyId)?.parent || "")).toLowerCase().includes(q)).sort((a, b) => a.name.localeCompare(b.name));
+  return `<div class="list"><input class="search" id="q-sw" placeholder="Find a swimmer" value="${esc(state.q)}" data-input="q">
+    ${list.map((s) => `<button class="pick" data-act="sel" data-id="${s.id}" aria-current="${state.sel === s.id}">
+      <span>${esc(s.name)}<small>${esc(fam(s.familyId)?.parent || "")}${extra(s)}</small></span>${lvlChip(s.level || 1)}</button>`).join("") || '<p class="muted" style="padding:8px">No swimmers yet.</p>'}
+  </div>`;
+}
+function ensureSel() { if (!swimmer(state.sel)) state.sel = state.swimmers.slice().sort((a, b) => a.name.localeCompare(b.name))[0]?.id || null; }
+
+/* Progress */
+function viewProgress() {
+  ensureSel(); const s = swimmer(state.sel);
+  if (!s) return `<div class="empty"><h3>No swimmers yet</h3>Add a family and a swimmer first.</div>`;
+  const f = fam(s.familyId), sk = skillsOf(s), cur = s.level || 1, p = levelProgress(s);
+  const hist = lessonsOf(s.id).filter((l) => l.status === "done").reverse().slice(0, 6);
+  const next = lessonsOf(s.id).find((l) => l.status === "booked" && l.date >= today());
+  return `<div class="split">${swimmerList()}
+  <section class="pane">
+    <div class="bar" style="margin:0">
+      <div style="margin-right:auto"><h2>${esc(s.name)} ${s.example ? '<span class="ex">Example</span>' : ""}</h2>
+      <span class="muted">${s.age ? `Age ${esc(s.age)} · ` : ""}${esc(f?.parent || "")}${next ? ` · Next lesson ${esc(fmtDay(next.date))} at ${esc(fmtTime(next.time))}` : ""}</span></div>
+      <button class="btn" data-act="edit-swimmer" data-id="${s.id}">Edit</button>
+      <button class="btn" data-act="to-video" data-id="${s.id}">Video feedback</button>
+      <button class="btn primary" data-act="to-update" data-id="${s.id}">Draft parent update</button>
+    </div>
+    <div class="legend"><span>Tap a skill to change it:</span><span>○ Not yet</span><span style="color:var(--sun)">● Working on it</span><span style="color:var(--good)">✓ Got it</span></div>
+    ${p.got === p.total && cur < 5 ? `<div class="notice"><span>${esc(first(s.name))} has every Level ${cur} skill. Ready to move up?</span><button class="btn small primary" data-act="level-up" data-id="${s.id}">Move to Level ${cur + 1}</button></div>` : ""}
+    ${LEVELS.map((L) => { const lp = levelProgress(s, L.n); const open = L.n === cur || (L.n < cur && lp.got < lp.total); return `
+      <div class="levelblock">
+        <header data-act="toggle-level" data-n="${L.n}">${lvlChip(L.n)}<h3>${esc(L.name)}${L.n === cur ? " · current level" : ""}</h3><span class="muted">${lp.got} of ${lp.total}</span></header>
+        <div class="skills" ${open || state.openLevel === L.n ? "" : "hidden"}>
+          ${L.skills.map((name, i) => { const st = sk[skillKey(L.n, i)] || "no"; return `
+            <button class="skill ${st}" data-act="skill" data-id="${s.id}" data-k="${skillKey(L.n, i)}">
+              <span class="dot">${st === "got" ? "✓" : st === "working" ? "●" : ""}</span><span>${esc(name)}</span><span class="st">${STATUS[st]}</span></button>`; }).join("")}
+        </div>
+      </div>`; }).join("")}
+    ${(() => { const fb = latestFeedback(s.id); return fb ? `<div class="notice honest" style="margin:0"><span><b>Latest video feedback</b> (${esc(new Date(fb.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" }))}): ${esc(fb.summary)}</span><button class="btn small" data-act="to-video" data-id="${s.id}">Open</button></div>` : ""; })()}
+    <label class="f">Coach notes (only you see these; Claude uses them when drafting updates)
+      <textarea id="notes-${s.id}" rows="3" data-save-notes="${s.id}" placeholder="Anything worth remembering: fears, wins, what motivates them">${esc(state.notesBuf[s.id] ?? s.notes ?? "")}</textarea></label>
+    <div><h3 style="font-size:16px;margin-bottom:6px">Recent lessons</h3>
+      <div class="history">${hist.map((l) => `<div><time>${esc(fmtDay(l.date))}</time><span>${esc(l.note || "No note")}</span></div>`).join("") || '<span class="muted">No taught lessons yet.</span>'}</div></div>
+  </section></div>`;
+}
+
+/* Updates */
+function swamRecently(s) { const cut = ymd(addDays(new Date(), -7)); return lessonsOf(s.id).some((l) => l.status === "done" && l.date >= cut && l.date <= today()); }
+function viewUpdates() {
+  ensureSel(); const s = swimmer(state.sel);
+  const drafts = state.updates.filter((u) => u.status === "draft").sort((a, b) => b.createdAt - a.createdAt);
+  const recent = state.swimmers.filter(swamRecently);
+  const batchBtn = state.batch
+    ? `<button class="btn" data-act="stop-batch">Stop (${state.batch.done} of ${state.batch.total})</button>`
+    : `<button class="btn primary" data-act="batch" ${recent.length ? "" : "disabled"}>Draft for everyone who swam this week (${recent.length})</button>`;
+  if (!s) return `<div class="empty"><h3>No swimmers yet</h3>Add a family and a swimmer first.</div>`;
+  const f = fam(s.familyId);
+  const mine = state.updates.filter((u) => u.swimmerId === s.id).sort((a, b) => b.createdAt - a.createdAt);
+  const d = state.draft && state.draft.swimmerId === s.id ? state.draft : null;
+  return `
+  <div class="bar"><h2>Parent updates</h2>${batchBtn}</div>
+  ${drafts.length ? `<details class="notice" style="display:block" ${state.showDrafts ? "open" : ""} data-act="drafts-toggle"><summary><b>${drafts.length} draft${drafts.length === 1 ? "" : "s"} waiting to send</b></summary>
+    <div style="display:grid;gap:10px;margin-top:10px">${drafts.map((u) => { const k = swimmer(u.swimmerId), pf = k && fam(k.familyId); return `
+      <div class="draftcard" style="background:var(--surface)"><div class="row" style="justify-content:space-between;align-items:center"><b>${esc(k?.name || "Swimmer")} → ${esc(pf?.parent || "")} ${pf?.phone ? `<span class="muted">${esc(pf.phone)}</span>` : ""}</b>
+      <span class="row"><button class="btn small" data-act="copy-update" data-id="${u.id}">Copy</button><button class="btn small" data-act="sent" data-id="${u.id}">Mark as sent</button><button class="btn small ghost" data-act="sel-edit" data-id="${u.id}">Edit</button></span></div><p>${esc(u.text)}</p></div>`; }).join("")}</div></details>` : ""}
+  <div class="split">${swimmerList((k) => (swamRecently(k) ? " · swam this week" : ""))}
+  <section class="pane">
+    <div><h2>${esc(s.name)}</h2><span class="muted">To ${esc(f?.parent || "parent")}${f?.phone ? ` · <span class="sel" style="user-select:all">${esc(f.phone)}</span>` : ""}</span></div>
+    <div class="row" style="gap:12px;align-items:end">
+      <label class="f" style="flex:1 1 180px">Style
+        <select id="tone" data-input="tone">
+          <option value="warm" ${state.tone === "warm" ? "selected" : ""}>Warm, a short paragraph</option>
+          <option value="text" ${state.tone === "text" ? "selected" : ""}>Quick text, 2–3 sentences</option>
+          <option value="milestone" ${state.tone === "milestone" ? "selected" : ""}>Celebrate a milestone</option>
+        </select></label>
+      <label class="f" style="flex:3 1 260px">Anything to mention? (optional)
+        <input id="extra" data-input="extra" value="${esc(state.extra)}" placeholder="e.g. jumped off the side for the first time today"></label>
+      <button class="btn primary" data-act="draft" data-id="${s.id}" ${state.busy ? "disabled" : ""}>${state.busy ? "Drafting…" : d ? "Draft again" : "Draft with Claude"}</button>
+    </div>
+    <textarea class="big" id="draft-text" data-input="draftText" placeholder="Claude writes a progress update from ${esc(first(s.name))}'s skills, lesson notes and your coach notes. You can edit it before sending.">${esc(d ? d.text : "")}</textarea>
+    ${d && d.note ? `<span class="muted">${esc(d.note)}</span>` : ""}
+    <div class="row">
+      <button class="btn" data-act="copy-draft" ${d && d.text ? "" : "disabled"}>Copy text</button>
+      <button class="btn" data-act="save-draft" ${d && d.text ? "" : "disabled"}>Save as draft</button>
+      <button class="btn" data-act="save-sent" ${d && d.text ? "" : "disabled"}>Save as sent</button>
+    </div>
+    <div><h3 style="font-size:16px;margin-bottom:6px">Past updates</h3>
+      <div class="history">${mine.map((u) => `<div><time>${esc(new Date(u.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" }))}</time><span class="pill ${u.status === "sent" ? "good" : "sun"}">${u.status === "sent" ? "Sent" : "Draft"}</span><span style="flex:1 1 240px">${esc(u.text.slice(0, 140))}${u.text.length > 140 ? "…" : ""}</span><button class="btn small ghost" data-act="del-update" data-id="${u.id}">Delete</button></div>`).join("") || '<span class="muted">None yet.</span>'}</div></div>
+  </section></div>`;
+}
+
+/* ---------- sign-in ---------- */
+function viewLogin() {
+  return `<div class="login">
+    <h2>${state.signup ? "Create your coach account" : "Coach sign in"}</h2>
+    <p class="muted">Only you can see your families, lessons and notes. Parents use your booking page instead.</p>
+    <form id="login-form" class="loginform">
+      <label class="f">Email<input id="login-email" type="email" autocomplete="username" required></label>
+      <label class="f">Password${state.signup ? " (at least 8 characters)" : ""}<input id="login-pass" type="password" autocomplete="${state.signup ? "new-password" : "current-password"}" minlength="${state.signup ? 8 : 1}" required></label>
+      ${state.loginError ? `<p class="warn" style="margin:0">${esc(state.loginError)}</p>` : ""}
+      <button class="btn primary" id="login-go">${state.signup ? "Create account" : "Sign in"}</button>
+    </form>
+    <button class="btn ghost small" data-act="toggle-signup">${state.signup ? "I already have an account" : "First time here? Create your coach account"}</button>
+  </div>`;
+}
+function viewNotCoach() {
+  return `<div class="login"><h2>This isn't the coach account</h2>
+    <p>You're signed in as <b>${esc(state.email || "")}</b>, but that email isn't the one in the database setup. Sign out and use the email you put in the setup file, or change that email in Supabase.</p>
+    <button class="btn" data-act="sign-out">Sign out</button></div>`;
+}
+
+/* ---------- booking: open times and parent requests ---------- */
+const digits = (p) => String(p || "").replace(/\D/g, "").slice(-10);
+const bookingLink = () => { try { return new URL("book.html", location.href).href; } catch (e) { return "book.html"; } };
+const familyForPhone = (phone) => (digits(phone) ? state.families.find((f) => digits(f.phone) === digits(phone)) : null);
+function reqCard(r) {
+  const f = familyForPhone(r.phone);
+  return `<article class="card req">
+    <div class="row" style="justify-content:space-between;align-items:center"><span class="when">${esc(longDay(r.slot_date))} at ${esc(fmtTime(r.slot_time))}</span><span class="pill sun">Waiting</span></div>
+    <h3>${esc(r.child_name)}${r.child_age ? ` <span class="muted" style="font-size:14px;font-weight:400">age ${esc(r.child_age)}</span>` : ""} ${r.example ? '<span class="ex">Example</span>' : ""}</h3>
+    <div class="contact"><span>${esc(r.parent_name)} · <span class="sel">${esc(r.phone)}</span></span>${r.email ? `<span class="sel">${esc(r.email)}</span>` : ""}${r.note ? `<span class="muted">“${esc(r.note)}”</span>` : ""}
+      <span class="muted">${f ? `Matches a family you have: ${esc(f.parent)}` : "New family. Approving adds them to Families."}</span></div>
+    <div class="row"><button class="btn primary small" data-act="approve" data-id="${r.id}">Approve</button><button class="btn small" data-act="decline" data-id="${r.id}">Decline</button></div>
+  </article>`;
+}
+function viewBooking() {
+  const t = today();
+  const pend = state.requests.filter((r) => r.status === "pending").sort((a, b) => (a.slot_date + a.slot_time).localeCompare(b.slot_date + b.slot_time));
+  const handled = state.requests.filter((r) => r.status !== "pending").sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))).slice(0, 20);
+  const up = state.slots.filter((x) => x.date >= t).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const days = [...new Set(up.map((x) => x.date))];
+  const count = (st) => up.filter((x) => x.status === st).length;
+  return `<div class="bar"><h2>Booking</h2><button class="btn primary" data-act="add-slots">Add open times</button></div>
+  <div class="sharebox"><b>Your booking page</b><span class="muted">Text this link to parents. They see only your open times, never other families, and they don't need an account.</span>
+    <code>${esc(bookingLink())}</code>
+    <div class="row"><button class="btn small" data-act="copy-link">Copy link</button><a class="btn small" href="book.html" target="_blank" rel="noopener">Open booking page</a></div></div>
+  <h3 class="section-h">Requests waiting <small>${pend.length ? `${pend.length} to answer` : "none right now"}</small></h3>
+  ${pend.length ? `<div class="reqs">${pend.map(reqCard).join("")}</div>` : '<p class="muted" style="margin:0">When a parent picks a time, it shows up here for you to approve.</p>'}
+  <h3 class="section-h">Open times <small>${count("open")} open · ${count("held")} requested · ${count("booked")} booked</small></h3>
+  ${days.length ? `<div class="slotdays">${days.map((d) => `<div class="slotday"><div class="dayhead">${esc(longDay(d))}</div><div class="chips">${up.filter((x) => x.date === d).map((x) =>
+      x.status === "open" ? `<span class="chip">${esc(fmtTime(x.time))} <small>${x.length} min</small><button data-act="del-slot" data-id="${x.id}" aria-label="Remove ${esc(fmtTime(x.time))}">×</button></span>`
+      : `<span class="chip ${x.status}">${esc(fmtTime(x.time))} <small>${x.status === "held" ? "requested" : "booked"}</small></span>`).join("")}</div></div>`).join("")}</div>`
+    : '<div class="empty" style="padding:24px"><h3>No open times yet</h3>Add the times you can teach, and parents can pick from them.</div>'}
+  ${handled.length ? `<details class="past" style="margin-top:20px"><summary><b>Answered requests</b></summary><div class="history" style="margin-top:8px">${handled.map((r) => `<div><time>${esc(fmtDay(r.slot_date))}</time><span class="pill ${r.status === "approved" ? "good" : ""}">${r.status === "approved" ? "Approved" : "Declined"}</span><span>${esc(r.child_name)} · ${esc(fmtTime(r.slot_time))} · ${esc(r.parent_name)}</span></div>`).join("")}</div></details>` : ""}`;
+}
+function slotsModal() {
+  const tomorrow = ymd(addDays(new Date(), 1));
+  openModal(`<h2>Add open times</h2>
+    <p class="muted" style="margin:0">Pick a day and the hours you can teach. Poolside splits them into lesson-length slots parents can request.</p>
+    <div class="two"><label class="f">First day<input id="s-date" name="date" type="date" required value="${tomorrow}"></label>
+    <label class="f">Lesson length<select id="s-len" name="length">${[20, 30, 45, 60].map((n) => `<option value="${n}" ${n === 30 ? "selected" : ""}>${n} minutes</option>`).join("")}</select></label></div>
+    <div class="two"><label class="f">From<input id="s-from" name="from" type="time" step="900" required value="09:00"></label>
+    <label class="f">Until<input id="s-to" name="to" type="time" step="900" required value="12:00"></label></div>
+    <label class="f">Repeat<select id="s-rep" name="repeat"><option value="1">Just this day</option>${[2, 3, 4, 6, 8, 10].map((n) => `<option value="${n}">Same day and hours for ${n} weeks</option>`).join("")}</select></label>
+    <p class="muted" id="s-preview" style="margin:0"></p>
+    <div class="acts"><button type="button" class="btn ghost" data-act="close">Cancel</button><button class="btn primary" id="s-go">Add times</button></div>`);
+  const form = $("#mform");
+  const plan = () => {
+    const v = Object.fromEntries(new FormData(form)), len = Number(v.length), rows = [];
+    const toMin = (x) => { const [h, m] = String(x || "0:0").split(":").map(Number); return h * 60 + m; };
+    const a = toMin(v.from), b = toMin(v.to);
+    if (!v.date || b - a < len) return { rows, error: "“Until” needs to be at least one lesson after “From”." };
+    for (let w = 0; w < Number(v.repeat || 1); w++) {
+      const d = ymd(addDays(parseD(v.date), w * 7));
+      for (let m = a; m + len <= b; m += len) {
+        const time = `${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
+        if (state.slots.some((x) => x.date === d && x.time === time) || state.lessons.some((l) => l.status !== "cancelled" && l.date === d && l.time === time)) continue;
+        rows.push({ id: newId(), date: d, time, length: len, status: "open", example: false });
+      }
+    }
+    return { rows };
+  };
+  const show = () => { const p = plan(); $("#s-preview").textContent = p.error || (p.rows.length ? `This adds ${p.rows.length} open time${p.rows.length === 1 ? "" : "s"}. Times you already have or have lessons at are skipped.` : "Nothing new to add. Those times already exist."); $("#s-go").disabled = !!p.error || !p.rows.length; };
+  form.addEventListener("input", show); show();
+  form.onsubmit = async (e) => {
+    e.preventDefault(); const p = plan(); if (p.error || !p.rows.length) return;
+    closeModal();
+    try { await book.addSlots(p.rows); toast(`Added ${p.rows.length} open time${p.rows.length === 1 ? "" : "s"}.`); }
+    catch (err) { toast("Couldn't save those times. Check your connection and try again."); }
+  };
+}
+function coachName() { return state.settings.coach || "Coach"; }
+async function approveRequest(r) {
+  const ex = !!r.example;
+  let f = familyForPhone(r.phone);
+  const fid = f ? f.id : await store.add("families", { parent: r.parent_name, phone: r.phone, email: r.email || "", notes: "Booked online", example: ex });
+  const k = state.swimmers.find((x) => x.familyId === fid && first(x.name).toLowerCase() === first(r.child_name).toLowerCase());
+  const sid = k ? k.id : await store.add("swimmers", { name: r.child_name, age: r.child_age || "", familyId: fid, level: 1, skills: {}, notes: r.note ? `Parent's note when booking: ${r.note}` : "", example: ex });
+  const lid = await store.add("lessons", { swimmerId: sid, date: r.slot_date, time: r.slot_time, length: r.slot_length || 30, status: "booked", note: "", example: ex });
+  if (r.slot_id && state.slots.some((x) => x.id === r.slot_id)) await book.updateSlot(r.slot_id, { status: "booked" });
+  await book.updateRequest(r.id, { status: "approved", lesson_id: lid });
+  const msg = `Hi ${first(r.parent_name)}! ${first(r.child_name)} is booked for a swim lesson on ${longDay(r.slot_date)} at ${fmtTime(r.slot_time)} (${r.slot_length || 30} minutes). See you at the pool!\n– ${coachName()}`;
+  replyModal("Approved", r, msg, f ? "" : `${r.parent_name} and ${first(r.child_name)} were added to Families at Level 1. You can change the level on the Progress tab.`);
+}
+async function declineRequest(r, reopen) {
+  if (r.slot_id && state.slots.some((x) => x.id === r.slot_id)) await book.updateSlot(r.slot_id, { status: reopen ? "open" : "booked" });
+  await book.updateRequest(r.id, { status: "declined" });
+  const msg = `Hi ${first(r.parent_name)}, thanks for asking about ${longDay(r.slot_date)} at ${fmtTime(r.slot_time)} for ${first(r.child_name)}. I'm sorry, that time doesn't work after all. Please pick another time on my booking page: ${bookingLink()}\n– ${coachName()}`;
+  replyModal("Declined", r, msg, reopen ? "That time is open again for other parents." : "That time stays closed.");
+}
+function replyModal(title, r, msg, note) {
+  openModal(`<h2>${esc(title)}</h2>${note ? `<p class="muted" style="margin:0">${esc(note)}</p>` : ""}
+    <div class="textcard"><header><b>Text to ${esc(r.parent_name)} <span class="muted" style="user-select:all">${esc(r.phone)}</span></b><button type="button" class="btn small" data-act="copy-text" data-msg="${esc(msg)}">Copy</button></header><pre>${esc(msg)}</pre></div>
+    <div class="acts"><button type="button" class="btn primary" data-act="close">Done</button></div>`);
+  $("#mform").onsubmit = (e) => { e.preventDefault(); closeModal(); };
+}
+function declineModal(r) {
+  openModal(`<h2>Decline this request?</h2><p style="margin:0">${esc(r.child_name)} · ${esc(longDay(r.slot_date))} at ${esc(fmtTime(r.slot_time))}</p>
+    <label class="row" style="gap:8px;align-items:center"><input type="checkbox" id="d-reopen" checked> Open this time again for other parents</label>
+    <div class="acts"><button type="button" class="btn ghost" data-act="close">Cancel</button><button class="btn primary">Decline</button></div>`);
+  $("#mform").onsubmit = async (e) => {
+    e.preventDefault(); const reopen = $("#d-reopen").checked; closeModal();
+    try { await declineRequest(r, reopen); } catch (err) { toast("Couldn't save. Check your connection and try again."); }
+  };
+}
+function settingsModal() {
+  openModal(`<h2>Settings</h2>${state.settings.coach ? "" : '<p style="margin:0">Welcome! Add your name and business name. Parents see them on your booking page, and they sign your texts.</p>'}
+    <div class="two"><label class="f">Your name (signs texts and updates)<input id="set-coach" name="coach" value="${esc(state.settings.coach || "")}" placeholder="Clare"></label>
+    <label class="f">Business name<input id="set-biz" name="business" value="${esc(state.settings.business || "")}" placeholder="e.g. Clare's Swim School"></label></div>
+    <p class="muted" style="margin:0;font-size:13px">Parents see these names on your booking page.</p>
+    <div class="acts">${state.mode === "cloud" ? '<button type="button" class="btn ghost left" data-act="sign-out">Sign out</button>' : ""}<button type="button" class="btn ghost" data-act="close">Cancel</button><button class="btn primary">Save</button></div>`);
+  $("#mform").onsubmit = async (e) => {
+    e.preventDefault(); const v = Object.fromEntries(new FormData(e.target)); closeModal();
+    try { await saveSettings({ coach: v.coach.trim(), business: v.business.trim() }); toast("Saved."); } catch (err) { toast("Couldn't save. Check your connection and try again."); }
+  };
+}
+
+/* ---------- lesson plans ---------- */
+const RANK = { no: 0, working: 1, got: 2 };
+const lessonById = (id) => state.lessons.find((l) => l.id === id);
+const planFor = (lid) => state.plans.find((p) => p.lessonId === lid);
+const latestFeedback = (sid) => state.feedback.filter((f) => f.swimmerId === sid).sort((a, b) => b.createdAt - a.createdAt)[0];
+const skillName = (k) => { const m = /^l(\d)s(\d)$/.exec(k || ""); return m ? LEVELS[m[1] - 1]?.skills[m[2]] || k : k; };
+const longDay = (d) => fmtDay(d, { weekday: "long", month: "short", day: "numeric" });
+function upcomingLessons(days = 14) {
+  const t = today(), end = ymd(addDays(new Date(), days - 1));
+  return state.lessons.filter((l) => l.status === "booked" && l.date >= t && l.date <= end && swimmer(l.swimmerId)).sort(byTime);
+}
+function errNote(e) {
+  return e && e.code === "rate_limited" ? "Claude is busy right now. Wait a minute and try again."
+    : e && e.code === "not_granted" ? "You're signed out, or this account isn't the coach account. Sign in again."
+    : e && (e.code === "no_key" || e.code === "bad_key") ? "The Anthropic key isn't set up correctly in Supabase. Check the setup guide."
+    : e && e.code === "offline" ? "Couldn't reach the AI. Check your internet connection."
+    : e && e.code === "refusal" ? "Claude declined this one."
+    : e && e.code === "rejected" ? "The AI couldn't process this. If it keeps happening, check your Anthropic credit balance."
+    : e && e.code === "image_rejected" ? "Claude couldn't read those frames. Try a different clip."
+    : "The AI couldn't finish this one. Try again in a minute.";
+}
+
+function viewPlans() {
+  const ups = upcomingLessons();
+  if (!lessonById(state.planSel)) state.planSel = (ups.find((l) => !planFor(l.id)) || ups[0])?.id || null;
+  const l = lessonById(state.planSel);
+  const missing = upcomingLessons(7).filter((x) => !planFor(x.id));
+  const batchBtn = state.planBatch
+    ? `<button class="btn" data-act="stop-plan-batch">Stop (${state.planBatch.done} of ${state.planBatch.total})</button>`
+    : `<button class="btn primary" data-act="plan-batch" ${missing.length && !state.planBusy ? "" : "disabled"}>Plan the next 7 days (${missing.length})</button>`;
+  if (!l || !swimmer(l.swimmerId)) return `<div class="bar"><h2>Lesson plans</h2></div><div class="empty"><h3>No lessons booked in the next two weeks</h3>Book lessons on the Schedule tab and Claude can plan each one.</div>`;
+  const s = swimmer(l.swimmerId), p = planFor(l.id);
+  const d = state.planDraft && state.planDraft.lessonId === l.id ? state.planDraft : null;
+  const text = d ? d.text : p ? p.text : "";
+  let lastDay = "";
+  const list = ups.map((x) => {
+    const k = swimmer(x.swimmerId), head = x.date !== lastDay ? `<div class="dayhead">${esc(longDay(x.date))}</div>` : "";
+    lastDay = x.date;
+    return head + `<button class="pick" data-act="plan-sel" data-id="${x.id}" aria-current="${x.id === l.id}"><span>${esc(k.name)}<small>${esc(fmtTime(x.time))} · ${x.length || 30} min</small></span><span class="pill ${planFor(x.id) ? "good" : ""}">${planFor(x.id) ? "Planned" : "No plan"}</span></button>`;
+  }).join("");
+  const fb = latestFeedback(s.id);
+  return `<div class="bar"><h2>Lesson plans</h2>${batchBtn}</div>
+  <div class="split"><div class="list">${list || '<p class="muted" style="padding:8px">No lessons in the next two weeks.</p>'}</div>
+  <section class="pane">
+    <div class="bar" style="margin:0"><div style="margin-right:auto"><h2>${esc(s.name)} ${s.example ? '<span class="ex">Example</span>' : ""}</h2>
+      <span class="muted">${esc(longDay(l.date))} at ${esc(fmtTime(l.time))} · ${l.length || 30} min · </span>${lvlChip(s.level || 1)}</div>
+      <button class="btn" data-act="open-swimmer" data-id="${s.id}">See skills</button></div>
+    <div class="row" style="gap:12px;align-items:end">
+      <label class="f" style="flex:3 1 260px">Anything to focus on? (optional)<input id="plan-focus" data-input="planFocus" value="${esc(state.planFocus)}" placeholder="e.g. nervous about the deep end last time"></label>
+      <button class="btn primary" data-act="plan-draft" data-id="${l.id}" ${state.planBusy || state.planBatch ? "disabled" : ""}>${state.planBusy ? "Planning…" : text ? "Draft again" : "Draft plan with Claude"}</button>
+    </div>
+    <p class="muted" style="margin:0;font-size:13px">Claude builds the plan from ${esc(first(s.name))}'s skills, recent lesson notes and your coach notes${fb ? ", plus the latest video feedback" : ""}.</p>
+    <textarea class="big plan" id="plan-text" data-input="planText" placeholder="A minute-by-minute plan for this lesson will appear here. You can edit it before saving.">${esc(text)}</textarea>
+    ${d && d.note ? `<span class="muted">${esc(d.note)}</span>` : p ? `<span class="muted">Saved plan${p.createdAt ? ` from ${esc(new Date(p.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" }))}` : ""}.</span>` : ""}
+    <div class="row"><button class="btn" data-act="plan-copy" ${text ? "" : "disabled"}>Copy</button><button class="btn" data-act="plan-save" ${d && d.text ? "" : "disabled"}>Save plan</button>${p ? `<button class="btn ghost" data-act="plan-del" data-id="${l.id}">Delete plan</button>` : ""}</div>
+  </section></div>`;
+}
+
+function skillLists(s) {
+  const sk = skillsOf(s), cur = s.level || 1, working = [], notYet = [], got = [];
+  LEVELS.forEach((L) => L.skills.forEach((name, i) => {
+    const st = sk[skillKey(L.n, i)] || "no";
+    if (st === "working") working.push(name); else if (L.n === cur && st === "no") notYet.push(name); else if (L.n === cur && st === "got") got.push(name);
+  }));
+  return { working, notYet, got, cur };
+}
+function planPrompt(l, s, focus) {
+  const len = l.length || 30, { working, notYet, got, cur } = skillLists(s);
+  const notes = lessonsOf(s.id).filter((x) => x.status === "done" && x.note).slice(-3).map((x) => `${fmtDay(x.date)}: ${x.note}`);
+  const fb = latestFeedback(s.id);
+  return `You are helping a swim instructor plan one private swim lesson. Write a plan they can glance at on their phone at the pool.
+Format: plain text only, no markdown symbols (no #, *, or **). First line: "Goal: " and one sentence. Then 4 or 5 time blocks, one per line, written like: 0-5 min | Warm-up: activity. Cue: "short cue". The blocks must cover exactly 0 to ${len} minutes with no gaps. The last block is a fun game that suits a ${s.age ? s.age + "-year-old" : "child"}. Final line: "Check today: " and the one skill to test for sign-off. Under 160 words. Keep it safe and right for the child's age and level. Use only the facts below and don't invent past events.
+
+Swimmer: ${s.name}${s.age ? `, age ${s.age}` : ""}
+Lesson: ${fmtDay(l.date)} at ${fmtTime(l.time)}, ${len} minutes
+Level ${cur} (${LEVELS[cur - 1].name})
+Already has at this level: ${got.join("; ") || "none yet"}
+Working on: ${working.join("; ") || "none marked"}
+Not started at this level: ${notYet.join("; ") || "none, ready to move up"}
+${cur < 5 ? `Next level's skills: ${LEVELS[cur].skills.join("; ")}` : "Top level reached"}
+Recent lesson notes: ${notes.join(" | ") || "none"}
+Coach notes: ${s.notes || "none"}
+Latest video feedback: ${fb ? `${fb.summary} Work on: ${(fb.workOn || []).map((w) => w.point).join("; ") || "nothing listed"}` : "none"}
+Instructor's focus for this lesson: ${focus || "none given"}`;
+}
+function templatePlan(l, s) {
+  const len = l.length || 30, { working, notYet, cur } = skillLists(s);
+  const focus = working[0] || notYet[0] || LEVELS[Math.min(cur, 4)].skills[0];
+  const a = Math.round(len * 0.17), b = Math.round(len * 0.5), c = len - Math.round(len * 0.17);
+  return `Goal: make progress on "${focus}".\n0-${a} min | Warm-up: kicking and bubbles along the wall.\n${a}-${b} min | Main skill: ${focus}. Short tries with lots of praise.\n${b}-${c} min | Practice: ${working[1] || notYet[1] || "review a skill they already have"}.\n${c}-${len} min | Fun finish: a game of their choice.\nCheck today: ${focus}`;
+}
+async function draftPlan(l, s, focus, onText, signal) {
+  const sm = await getSample();
+  if (!sm) return { text: templatePlan(l, s), note: "The AI isn't connected yet, so this plan came from a simple template." };
+  try {
+    const r = await sm(planPrompt(l, s, focus), { onText: onText ? ({ text }) => onText(text) : undefined, modelTier: "default", cache: false, signal });
+    return { text: r.text.trim(), note: "Drafted by Claude. Change anything you like, then save it." };
+  } catch (e) {
+    if (e && e.code === "cancelled") throw e;
+    return { text: templatePlan(l, s), note: errNote(e) + " A simple template was used instead.", failed: e && e.code };
+  }
+}
+async function runPlanBatch() {
+  const list = upcomingLessons(7).filter((l) => !planFor(l.id));
+  if (!list.length) return;
+  const ctl = new AbortController(); state.planBatch = { done: 0, total: list.length, ctl }; render();
+  let failed = 0;
+  for (const l of list) {
+    if (ctl.signal.aborted) break;
+    try {
+      const s = swimmer(l.swimmerId), r = await draftPlan(l, s, "", null, ctl.signal);
+      if (r.failed) failed++;
+      await store.set("plans", l.id, { lessonId: l.id, swimmerId: l.swimmerId, text: r.text, createdAt: Date.now(), example: !!s.example });
+      if (r.failed === "rate_limited" || r.failed === "not_granted") break;
+    } catch (e) { break; }
+    state.planBatch.done++; render();
+  }
+  const done = state.planBatch.done; state.planBatch = null; render();
+  toast(failed ? `Planned ${done}. ${failed} used a simple template because the AI wasn't available.` : `Planned ${done} lesson${done === 1 ? "" : "s"}.`);
+}
+
+/* ---------- video feedback ---------- */
+const MAX_FRAMES = 8;
+function checkImageCaps() {
+  if (checkImageCaps.p) return;
+  checkImageCaps.p = (async () => {
+    const sm = await getSample(); let c = null;
+    try { c = sm && sm.limits ? (await sm.limits()).images || null : null; } catch (e) { c = null; }
+    state.imgCaps = c; render();
+  })();
+}
+const frameCount = () => Math.max(1, Math.min(state.imgCaps?.maxCount || MAX_FRAMES, MAX_FRAMES));
+const confCls = (c) => (c === "high" ? "good" : c === "medium" ? "" : "sun");
+
+function viewVideo() {
+  ensureSel(); checkImageCaps();
+  const s = swimmer(state.sel);
+  if (!s) return `<div class="empty"><h3>No swimmers yet</h3>Add a family and a swimmer first.</div>`;
+  const v = state.vid && state.vid.swimmerId === s.id ? state.vid : null;
+  const cur = s.level || 1, caps = state.imgCaps;
+  const focusOpts = [...new Set([cur, Math.min(5, cur + 1)])].flatMap((n) => LEVELS[n - 1].skills.map((name, i) => ({ k: skillKey(n, i), label: `Level ${n}: ${name}` })));
+  const hist = state.feedback.filter((f) => f.swimmerId === s.id).sort((a, b) => b.createdAt - a.createdAt);
+  const fmtD = (t) => new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return `<div class="bar"><h2>Video feedback</h2></div>
+  <div class="notice honest"><span><b>How much to trust this:</b> Claude looks at ${frameCount()} still frames pulled from your clip, not the moving video. It does fairly well with body position, head position and the shape of the arms and legs. It can't reliably judge timing, rhythm, speed, distance or how long something lasted, and it can be wrong, especially with splashing, glare or a far-away camera. Treat it as a second opinion. Nothing gets checked off until you confirm it. The video stays on your device. Only the still frames go to Claude, and only the written feedback is saved.</span></div>
+  <div class="split">${swimmerList()}
+  <section class="pane">
+    <div><h2>${esc(s.name)} ${s.example ? '<span class="ex">Example</span>' : ""}</h2><span class="muted">${lvlChip(cur)} ${esc(LEVELS[cur - 1].name)}</span></div>
+    ${caps === null ? `<div class="notice" style="margin:0"><span>The AI isn't connected yet, so you can preview frames but not get feedback. It starts working once the setup guide is finished.</span></div>` : ""}
+    <div class="row" style="gap:12px;align-items:end">
+      <label class="f" style="flex:2 1 240px">What's in the clip?<select id="vfocus" data-input="vfocus"><option value="">Not sure. Give general feedback</option>${focusOpts.map((o) => `<option value="${o.k}" ${state.vfocus === o.k ? "selected" : ""}>${esc(o.label)}</option>`).join("")}</select></label>
+      <label class="btn filebtn">${v && v.frames ? "Choose a different clip" : "Choose a video or photos"}<input type="file" id="vfile" accept="video/*,image/*" multiple class="vh"></label>
+    </div>
+    <p class="muted" style="margin:0;font-size:13px">Works best with 5 to 20 seconds, filmed from the side, one swimmer in view, camera held still. Get the parent's OK before filming their child.</p>
+    ${v && v.loading ? `<p class="muted" style="margin:0">Pulling still frames from ${esc(v.name)}…</p>` : ""}
+    ${v && v.error ? `<p class="warn" style="margin:0">${esc(v.error)}</p>` : ""}
+    ${v && v.frames ? `<div class="frames">${v.frames.map((f) => `<figure><img src="${f.url}" alt="${esc(f.label)}"><figcaption>${esc(f.label)}</figcaption></figure>`).join("")}</div>
+      <div class="row" style="align-items:center"><button class="btn primary" data-act="vfeedback" ${v.busy || !caps ? "disabled" : ""}>${v.busy ? "Claude is looking…" : v.result ? "Ask again" : "Get feedback from Claude"}</button><span class="muted">${v.frames.length} frame${v.frames.length === 1 ? "" : "s"} from ${esc(v.name)}${v.duration ? ` (${Math.round(v.duration)} seconds)` : ""}</span></div>` : ""}
+    ${v && v.result ? feedbackCard(v.result, s, true) : ""}
+    <div><h3 style="font-size:16px;margin-bottom:6px">Past feedback</h3>
+      ${hist.map((f) => `<details class="past"><summary><span class="muted">${esc(fmtD(f.createdAt))}</span> <span class="pill ${confCls(f.confidence)}">${esc(f.confidence || "low")} confidence</span> ${esc(f.focus ? skillName(f.focus) + ": " : "")}${esc(f.summary)}</summary>${feedbackCard(f, s, false)}</details>`).join("") || '<span class="muted">None yet.</span>'}</div>
+  </section></div>`;
+}
+function feedbackCard(f, s, live) {
+  const sk = skillsOf(s), conf = f.confidence || "low";
+  return `<div class="fb">
+    ${live ? `<div class="row" style="align-items:center"><span class="pill ${confCls(conf)}">Claude's confidence: ${esc(conf)}</span>${f.canSee === false ? '<span class="warn">Claude had trouble seeing the swimmer clearly.</span>' : ""}</div><p>${esc(f.summary)}</p>` : ""}
+    ${(f.strengths || []).length ? `<div><h4>Doing well</h4><ul>${f.strengths.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
+    ${(f.workOn || []).length ? `<div><h4>Work on next</h4><ul>${f.workOn.map((w) => `<li><b>${esc(w.point)}</b>${w.why ? ` ${esc(w.why)}` : ""}${w.drill ? `<br><span class="muted">Drill: ${esc(w.drill)}</span>` : ""}</li>`).join("")}</ul></div>` : ""}
+    ${live && (f.skillSuggestions || []).length ? `<div><h4>Suggested skill updates (you decide)</h4><div class="sugg">${f.skillSuggestions.map((g) => {
+      const done = RANK[sk[g.key] || "no"] >= RANK[g.status];
+      return `<div class="sg"><span><b>${esc(skillName(g.key))}</b> → ${STATUS[g.status]}<br><span class="muted">${esc(g.reason)}</span></span>${done ? '<span class="pill good">✓ Updated</span>' : `<button class="btn small" data-act="vconfirm" data-k="${g.key}" data-st="${g.status}">Confirm</button>`}</div>`;
+    }).join("")}</div></div>` : live ? '<p class="muted" style="font-size:14px">No skill changes suggested from these frames.</p>' : ""}
+    ${f.cantJudge ? `<p class="muted" style="font-size:13px">What these frames can't show: ${esc(f.cantJudge)}</p>` : ""}
+  </div>`;
+}
+
+const seekTo = (v, t) => new Promise((res) => { const h = () => { v.removeEventListener("seeked", h); res(); }; v.addEventListener("seeked", h); v.currentTime = t; setTimeout(res, 4000); });
+const toJpeg = (canvas) => new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error("Couldn't save a frame."))), "image/jpeg", 0.82));
+function sizeCanvas(w, h) { const k = Math.min(1, 1024 / Math.max(w, h)); const c = document.createElement("canvas"); c.width = Math.round(w * k); c.height = Math.round(h * k); return c; }
+async function framesFromVideo(file, count) {
+  const url = URL.createObjectURL(file), video = document.createElement("video");
+  video.muted = true; video.playsInline = true; video.preload = "auto"; video.src = url;
+  const bad = "This video couldn't be opened in this browser. iPhone videos sometimes only open in Safari. Try Safari, or save the clip as an MP4.";
+  try {
+    await new Promise((res, rej) => { video.onloadeddata = res; video.onerror = () => rej(new Error(bad)); setTimeout(() => rej(new Error(bad)), 20000); });
+    try { await video.play(); video.pause(); } catch (e) {}
+    const dur = video.duration;
+    if (!isFinite(dur) || dur <= 0 || !video.videoWidth) throw new Error(bad);
+    const canvas = sizeCanvas(video.videoWidth, video.videoHeight), ctx = canvas.getContext("2d"), frames = [];
+    for (let i = 0; i < count; i++) {
+      const t = count === 1 ? dur / 2 : dur * (0.05 + (0.9 * i) / (count - 1));
+      await seekTo(video, t); ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const blob = await toJpeg(canvas);
+      frames.push({ blob, url: URL.createObjectURL(blob), t, label: `${t.toFixed(1)} s` });
+    }
+    return { frames, duration: dur };
+  } finally { URL.revokeObjectURL(url); }
+}
+async function shrinkImage(file) {
+  let bmp;
+  try { bmp = await createImageBitmap(file); } catch (e) { throw new Error(`${file.name} couldn't be opened. Try a JPG or PNG, or take a screenshot of it.`); }
+  const canvas = sizeCanvas(bmp.width, bmp.height); canvas.getContext("2d").drawImage(bmp, 0, 0, canvas.width, canvas.height);
+  const blob = await toJpeg(canvas);
+  return { blob, url: URL.createObjectURL(blob), t: 0, label: file.name };
+}
+async function handleFiles(files) {
+  const s = swimmer(state.sel); files = [...(files || [])];
+  if (!s || !files.length) return;
+  (state.vid?.frames || []).forEach((f) => URL.revokeObjectURL(f.url));
+  const isVid = (f) => f.type.startsWith("video/") || /\.(mov|mp4|m4v|webm)$/i.test(f.name);
+  const vid = files.find(isVid);
+  state.vid = { swimmerId: s.id, loading: true, name: (vid || files[0]).name || "your clip" }; render();
+  try {
+    let frames, duration = 0;
+    if (vid) ({ frames, duration } = await framesFromVideo(vid, frameCount()));
+    else { frames = []; for (const f of files.slice(0, frameCount())) frames.push(await shrinkImage(f)); }
+    state.vid = { swimmerId: s.id, name: vid ? vid.name || "your clip" : `${frames.length} photo${frames.length === 1 ? "" : "s"}`, frames, duration };
+    if (vid && duration > 60) toast("That's a long clip, so the frames are far apart. A 5 to 20 second clip works better.");
+  } catch (e) { state.vid = { swimmerId: s.id, error: e.message || "Couldn't read that file." }; }
+  render();
+}
+function videoPrompt(s, v) {
+  const cur = s.level || 1, sk = skillsOf(s);
+  const skillLines = [...new Set([cur, Math.min(5, cur + 1)])].flatMap((n) => LEVELS[n - 1].skills.map((name, i) => `${skillKey(n, i)}: ${name} (Level ${n}), currently "${STATUS[sk[skillKey(n, i)] || "no"]}"`)).join("\n");
+  const when = v.duration ? `taken in order from a ${Math.round(v.duration)}-second phone video, at ${v.frames.map((f) => f.t.toFixed(1) + "s").join(", ")}` : "photos taken during a lesson";
+  return `You are an experienced, encouraging swim instructor reviewing a child's swimming. The ${v.frames.length} attached images are still frames ${when}.
+
+Swimmer: ${first(s.name)}${s.age ? `, age ${s.age}` : ""}, Level ${cur} (${LEVELS[cur - 1].name}).
+The instructor wants feedback on: ${state.vfocus ? skillName(state.vfocus) : "anything you notice"}.
+Coach notes: ${s.notes || "none"}
+
+Skills you may comment on (key: skill, current status):
+${skillLines}
+
+Be honest about what still frames can and can't show. You can judge body position, head position, the shape of the arms and legs, and whether the child looks comfortable. You cannot reliably judge timing, rhythm, speed, distance or how long something lasted. If the swimmer is hard to see (splash, glare, blur, far away, several children), say so and lower your confidence. Describe only what is visible and never guess.
+
+Reply with only a JSON object in this shape:
+{"canSee": true, "summary": "2 plain-language sentences", "strengths": ["short point"], "workOn": [{"point": "short", "why": "one sentence", "drill": "one simple drill"}], "skillSuggestions": [{"key": "l2s1", "status": "working", "reason": "what in the frames shows this"}], "confidence": "low", "cantJudge": "one sentence on what these frames can't show"}
+
+Rules: at most 3 strengths, 3 workOn items and 3 skillSuggestions. Only use keys from the list above. Suggest "got" only when the frames clearly show the skill done without help; for skills defined by a distance or a time, suggest at most "working". Never suggest a status lower than the current one. confidence must be "low", "medium" or "high".`;
+}
+function cleanFeedback(raw, s) {
+  const arr = (x) => (Array.isArray(x) ? x : []), str = (x) => (typeof x === "string" ? x.trim() : "");
+  const sk = skillsOf(s), valid = new Set(LEVELS.flatMap((L) => L.skills.map((_, i) => skillKey(L.n, i))));
+  return {
+    canSee: raw?.canSee !== false,
+    summary: str(raw?.summary) || "Claude didn't give a summary.",
+    strengths: arr(raw?.strengths).map(str).filter(Boolean).slice(0, 3),
+    workOn: arr(raw?.workOn).map((w) => ({ point: str(w?.point), why: str(w?.why), drill: str(w?.drill) })).filter((w) => w.point).slice(0, 3),
+    skillSuggestions: arr(raw?.skillSuggestions).filter((g) => valid.has(g?.key) && (g.status === "working" || g.status === "got") && RANK[g.status] > RANK[sk[g.key] || "no"])
+      .map((g) => ({ key: g.key, status: g.status, reason: str(g.reason) })).slice(0, 3),
+    confidence: ["low", "medium", "high"].includes(raw?.confidence) ? raw.confidence : "low",
+    cantJudge: str(raw?.cantJudge),
+  };
+}
+async function getFeedback() {
+  const v = state.vid, s = v && swimmer(v.swimmerId), sm = await getSample();
+  if (!s || !v.frames || !sm) return;
+  v.busy = true; v.error = null; v.result = null; render();
+  try {
+    const raw = await sm.json(videoPrompt(s, v), { images: v.frames.map((f) => f.blob), modelTier: "default", cache: false });
+    v.result = cleanFeedback(raw, s);
+    await store.add("feedback", { swimmerId: s.id, focus: state.vfocus || "", ...v.result, frames: v.frames.length, example: !!s.example });
+  } catch (e) {
+    v.error = e && e.code === "invalid_json" ? "Claude's answer came back in a shape the page couldn't read. Try again." : errNote(e);
+  }
+  v.busy = false; render();
+}
+
+/* ---------- AI drafting ---------- */
+function buildPrompt(s, tone, extra) {
+  const f = fam(s.familyId), sk = skillsOf(s), cur = s.level || 1;
+  const got = [], working = [];
+  LEVELS.forEach((L) => L.skills.forEach((name, i) => { const st = sk[skillKey(L.n, i)]; if (st === "got" && L.n >= cur - 1) got.push(`${name} (Level ${L.n})`); if (st === "working") working.push(name); }));
+  const notes = lessonsOf(s.id).filter((l) => l.status === "done" && l.note).slice(-4).map((l) => `${fmtDay(l.date)}: ${l.note}`);
+  const next = lessonsOf(s.id).find((l) => l.status === "booked" && l.date >= today());
+  const length = { warm: "one friendly paragraph of 4-6 sentences", text: "a short text message of 2-3 sentences", milestone: "a celebratory message of 3-5 sentences centered on the newest skill or level" }[tone];
+  return `You are helping a swim instructor write a progress update to a parent. Write it as the instructor, in first person.
+Rules: ${length}. Plain text only, no markdown, no subject line, no emoji. Use only the facts below and never invent skills, times or events. Mention one or two specific things the child did well and what we're working on next. Sound like a real, warm local coach, not a company. Start with "Hi ${first(f?.parent) || "there"}," and sign off with "– ${state.settings.coach || "Coach"}".
+
+Instructor: ${state.settings.coach || "Coach"}
+Swimmer: ${s.name}${s.age ? `, age ${s.age}` : ""}
+Current level: Level ${cur} (${LEVELS[cur - 1].name}), ${levelProgress(s).got} of 4 skills done
+Skills mastered recently: ${got.join("; ") || "none yet"}
+Working on now: ${working.join("; ") || "nothing marked"}
+Recent lesson notes: ${notes.join(" | ") || "none"}
+Coach notes: ${s.notes || "none"}
+Latest video review: ${latestFeedback(s.id)?.summary || "none"}
+Next lesson: ${next ? `${fmtDay(next.date)} at ${fmtTime(next.time)}` : "not booked"}
+Something to mention today: ${extra || "nothing extra"}
+
+Write only the message.`;
+}
+function templateDraft(s, extra) {
+  const f = fam(s.familyId), sk = skillsOf(s), cur = s.level || 1;
+  const got = LEVELS[cur - 1].skills.filter((_, i) => sk[skillKey(cur, i)] === "got");
+  const working = LEVELS.flatMap((L) => L.skills.filter((_, i) => sk[skillKey(L.n, i)] === "working"));
+  return `Hi ${first(f?.parent) || "there"}, quick update on ${first(s.name)}! ${got.length ? `${first(s.name)} can now ${got.slice(-2).join(" and ").toLowerCase()}.` : `${first(s.name)} is settling into Level ${cur}.`} ${working.length ? `Next we're working on ${working.slice(0, 2).join(" and ").toLowerCase()}.` : ""} ${extra ? extra.charAt(0).toUpperCase() + extra.slice(1) + "." : ""}\n– ${state.settings.coach || "Coach"}`.replace(/ +/g, " ");
+}
+async function getSample() {
+  if (!sampleTried) { sampleTried = true; sample = sb ? makeSample() : null; }
+  return sample;
+}
+async function draftFor(s, tone, extra, onText, signal) {
+  const sm = await getSample();
+  if (!sm) return { text: templateDraft(s, extra), note: "The AI isn't connected yet, so this draft came from a simple template." };
+  try {
+    const r = await sm(buildPrompt(s, tone, extra), { onText: onText ? ({ text }) => onText(text) : undefined, modelTier: "default", cache: false, signal });
+    return { text: r.text.trim(), note: "Drafted by Claude. Read it over and edit anything before you send it." };
+  } catch (e) {
+    if (e && e.code === "cancelled") throw e;
+    return { text: templateDraft(s, extra), note: errNote(e) + " A simple template was used instead.", failed: e && e.code };
+  }
+}
+
+/* ---------- modals ---------- */
+function openModal(html) { $("#modal").innerHTML = `<div class="scrim" data-act="close-scrim"><form class="modal" id="mform" autocomplete="off">${html}</form></div>`; const i = $("#modal input, #modal select"); if (i) i.focus(); }
+function closeModal() { $("#modal").innerHTML = ""; state.confirm = null; }
+const familyOpts = (sel) => state.families.slice().sort((a, b) => a.parent.localeCompare(b.parent)).map((f) => `<option value="${f.id}" ${f.id === sel ? "selected" : ""}>${esc(f.parent)}</option>`).join("");
+const swimmerOpts = (sel) => state.swimmers.slice().sort((a, b) => a.name.localeCompare(b.name)).map((s) => `<option value="${s.id}" ${s.id === sel ? "selected" : ""}>${esc(s.name)} (${esc(fam(s.familyId)?.parent || "")})</option>`).join("");
+
+function familyModal(f) {
+  openModal(`<h2>${f ? "Edit family" : "Add a family"}</h2>
+    <label class="f">Parent or guardian name<input id="m-parent" name="parent" required value="${esc(f?.parent || "")}" placeholder="e.g. Jordan Rivera"></label>
+    <div class="two"><label class="f">Phone<input id="m-phone" name="phone" value="${esc(f?.phone || "")}" placeholder="555-0123"></label>
+    <label class="f">Email<input id="m-email" name="email" type="email" value="${esc(f?.email || "")}"></label></div>
+    ${f ? "" : `<div class="two"><label class="f">First swimmer's name<input id="m-kid" name="kid" placeholder="optional"></label><label class="f">Age<input id="m-kidage" name="kidage" inputmode="numeric"></label></div>`}
+    <label class="f">Notes<input id="m-notes" name="notes" value="${esc(f?.notes || "")}" placeholder="Preferred times, siblings, allergies"></label>
+    <div class="acts">${f ? `<button type="button" class="btn danger left" data-act="del-family" data-id="${f.id}">${state.confirm === "fam" ? "Click again: delete family, swimmers and lessons" : "Delete"}</button>` : ""}
+      <button type="button" class="btn ghost" data-act="close">Cancel</button><button class="btn primary">${f ? "Save" : "Add family"}</button></div>`);
+  $("#mform").onsubmit = async (e) => {
+    e.preventDefault(); const v = Object.fromEntries(new FormData(e.target));
+    const data = { parent: v.parent.trim(), phone: v.phone.trim(), email: v.email.trim(), notes: v.notes.trim() };
+    closeModal();
+    try {
+      if (f) await store.update("families", f.id, data);
+      else { const id = await store.add("families", data); if (v.kid && v.kid.trim()) await store.add("swimmers", { name: v.kid.trim(), age: v.kidage.trim(), familyId: id, level: 1, skills: {}, notes: "" }); }
+      toast(f ? "Saved." : "Family added.");
+    } catch (err) { toast("Couldn't save. Check your connection and try again."); }
+  };
+}
+function swimmerModal(s, fid) {
+  openModal(`<h2>${s ? "Edit swimmer" : "Add a swimmer"}</h2>
+    <div class="two"><label class="f">Name<input id="m-name" name="name" required value="${esc(s?.name || "")}"></label>
+    <label class="f">Age<input id="m-age" name="age" inputmode="numeric" value="${esc(s?.age || "")}"></label></div>
+    <div class="two"><label class="f">Family<select id="m-fam" name="familyId" required>${familyOpts(s?.familyId || fid)}</select></label>
+    <label class="f">Level<select id="m-level" name="level">${LEVELS.map((L) => `<option value="${L.n}" ${(s?.level || 1) === L.n ? "selected" : ""}>Level ${L.n}: ${L.name}</option>`).join("")}</select></label></div>
+    <div class="acts">${s ? `<button type="button" class="btn danger left" data-act="del-swimmer" data-id="${s.id}">${state.confirm === "sw" ? "Click again: delete swimmer and lessons" : "Delete"}</button>` : ""}
+      <button type="button" class="btn ghost" data-act="close">Cancel</button><button class="btn primary">${s ? "Save" : "Add swimmer"}</button></div>`);
+  $("#mform").onsubmit = async (e) => {
+    e.preventDefault(); const v = Object.fromEntries(new FormData(e.target));
+    const data = { name: v.name.trim(), age: v.age.trim(), familyId: v.familyId, level: Number(v.level) };
+    closeModal();
+    try { if (s) await store.update("swimmers", s.id, data); else { state.sel = await store.add("swimmers", { ...data, skills: {}, notes: "" }); } toast("Saved."); }
+    catch (err) { toast("Couldn't save. Check your connection and try again."); }
+  };
+}
+function lessonModal(l, date) {
+  if (!state.swimmers.length) { toast("Add a family and swimmer first."); state.tab = "families"; render(); return; }
+  openModal(`<h2>${l ? "Lesson" : "Book a lesson"}</h2>
+    <label class="f">Swimmer<select id="m-sw" name="swimmerId" required>${swimmerOpts(l?.swimmerId)}</select></label>
+    <div class="two"><label class="f">Date<input id="m-date" name="date" type="date" required value="${esc(l?.date || date || today())}"></label>
+    <label class="f">Start time<input id="m-time" name="time" type="time" step="900" required value="${esc(l?.time || "10:00")}"></label></div>
+    <div class="two"><label class="f">Length<select id="m-len" name="length">${[20, 30, 45, 60].map((n) => `<option value="${n}" ${(l?.length || 30) === n ? "selected" : ""}>${n} minutes</option>`).join("")}</select></label>
+    ${l ? `<label class="f">Status<select id="m-status" name="status">${["booked", "done", "cancelled"].map((x) => `<option value="${x}" ${l.status === x ? "selected" : ""}>${{ booked: "Booked", done: "Taught", cancelled: "Cancelled" }[x]}</option>`).join("")}</select></label>`
+      : `<label class="f">Repeat<select id="m-rep" name="repeat"><option value="1">Just once</option>${[2, 3, 4, 5, 6, 8].map((n) => `<option value="${n}">Same time for ${n} weeks</option>`).join("")}</select></label>`}</div>
+    <label class="f">Lesson note${l ? "" : " (optional)"}<input id="m-note" name="note" value="${esc(l?.note || "")}" placeholder="What happened in the lesson? Claude uses this for updates."></label>
+    <p class="warn" id="m-clash" hidden></p>
+    <div class="acts">${l ? `<button type="button" class="btn danger left" data-act="del-lesson" data-id="${l.id}">${state.confirm === "les" ? "Click again to delete" : "Delete"}</button>${l.status !== "done" ? `<button type="button" class="btn" data-act="mark-done" data-id="${l.id}">Mark taught</button>` : ""}<button type="button" class="btn" data-act="open-plan" data-id="${l.id}">${planFor(l.id) ? "View lesson plan" : "Plan this lesson"}</button>` : ""}
+      <button type="button" class="btn ghost" data-act="close">Cancel</button><button class="btn primary">${l ? "Save" : "Book"}</button></div>`);
+  const form = $("#mform");
+  const check = () => {
+    const v = Object.fromEntries(new FormData(form)); const reps = Number(v.repeat || 1); const hits = [];
+    for (let i = 0; i < reps; i++) { const d = ymd(addDays(parseD(v.date), i * 7)); state.lessons.filter((x) => x.id !== l?.id && x.status !== "cancelled" && x.date === d && x.time === v.time).forEach((x) => hits.push(`${swimmer(x.swimmerId)?.name || "someone"} on ${fmtDay(d)}`)); }
+    const w = $("#m-clash"); w.hidden = !hits.length; w.textContent = hits.length ? `Heads up: this time is already booked for ${hits.join(", ")}. You can still book it.` : "";
+  };
+  form.addEventListener("input", check); check();
+  form.onsubmit = async (e) => {
+    e.preventDefault(); const v = Object.fromEntries(new FormData(form));
+    const base = { swimmerId: v.swimmerId, time: v.time, length: Number(v.length), note: v.note.trim() };
+    closeModal();
+    try {
+      if (l) await store.update("lessons", l.id, { ...base, date: v.date, status: v.status });
+      else { const reps = Number(v.repeat || 1); for (let i = 0; i < reps; i++) await store.add("lessons", { ...base, date: ymd(addDays(parseD(v.date), i * 7)), status: "booked" }); toast(reps > 1 ? `Booked ${reps} weekly lessons.` : "Lesson booked."); }
+      if (!l) { state.week = mondayOf(parseD(v.date)); state.weekChosen = true; render(); }
+    } catch (err) { toast("Couldn't save. Check your connection and try again."); }
+  };
+}
+function textsModal() {
+  const days = [...Array(7)].map((_, i) => ymd(addDays(state.week, i)));
+  const ls = state.lessons.filter((l) => l.date >= days[0] && l.date <= days[6] && l.status !== "cancelled").sort(byTime);
+  const groups = {}; ls.forEach((l) => { const s = swimmer(l.swimmerId); if (!s) return; (groups[s.familyId] = groups[s.familyId] || []).push({ l, s }); });
+  const sentSet = state.textedSet || (state.textedSet = new Set());
+  const cards = Object.entries(groups).map(([fid, items]) => {
+    const f = fam(fid); const names = [...new Set(items.map((x) => first(x.s.name)))];
+    const lines = items.map(({ l, s }) => `• ${fmtDay(l.date, { weekday: "long", month: "short", day: "numeric" })} at ${fmtTime(l.time)}${names.length > 1 ? ` (${first(s.name)})` : ""}`).join("\n");
+    const msg = `Hi ${first(f?.parent) || "there"}! Here ${items.length === 1 ? "is" : "are"} ${names.join(" & ")}'s swim lesson${items.length === 1 ? "" : "s"} for the week of ${fmtDay(days[0], { month: "short", day: "numeric" })}:\n${lines}\nReply YES to confirm, or let me know if anything needs to change. See you at the pool!\n– ${state.settings.coach || "Coach"}`;
+    const key = fid + days[0];
+    return `<div class="textcard"><header><b>${esc(f?.parent || "Family")}${f?.phone ? ` <span class="muted" style="user-select:all">${esc(f.phone)}</span>` : ""}</b>
+      <span class="row"><button type="button" class="btn small" data-act="copy-text" data-msg="${esc(msg)}">Copy</button><button type="button" class="btn small ${sentSet.has(key) ? "" : "ghost"}" data-act="texted" data-k="${key}">${sentSet.has(key) ? "✓ Texted" : "Mark texted"}</button></span></header><pre>${esc(msg)}</pre></div>`;
+  });
+  openModal(`<h2>Schedule texts for this week</h2><p class="muted" style="margin:0">One message per family with all of their lesson times. Copy each one into your texting app. ${cards.length} ${cards.length === 1 ? "family" : "families"}.</p>${cards.join("")}<div class="acts"><button type="button" class="btn primary" data-act="close">Done</button></div>`);
+  $("#mform").onsubmit = (e) => { e.preventDefault(); closeModal(); };
+}
+
+/* ---------- examples (practice data, always marked example: true) ---------- */
+/*SEED*/
+function exampleData(now) {
+  const mon = (() => { const x = new Date(now.getFullYear(), now.getMonth(), now.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; })();
+  const d = (offset) => { const x = new Date(mon); x.setDate(x.getDate() + offset); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`; };
+  const t = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const families = [
+    { id: "ex-f1", parent: "Maria Lopez (example)", phone: "555-0101", email: "maria@example.com", notes: "Prefers mornings" },
+    { id: "ex-f2", parent: "Dan Okafor (example)", phone: "555-0102", email: "dan@example.com", notes: "Two kids, back-to-back lessons" },
+    { id: "ex-f3", parent: "Priya Shah (example)", phone: "555-0103", email: "", notes: "" },
+    { id: "ex-f4", parent: "Tom Becker (example)", phone: "555-0104", email: "tom@example.com", notes: "Away the week of the 4th" },
+    { id: "ex-f5", parent: "Aisha Grant (example)", phone: "555-0105", email: "", notes: "Afternoons only" },
+    { id: "ex-f6", parent: "Kevin Nguyen (example)", phone: "555-0106", email: "kevin@example.com", notes: "" },
+  ];
+  const S = (keys, w = []) => Object.fromEntries([...keys.map((k) => [k, "got"]), ...w.map((k) => [k, "working"])]);
+  const swimmers = [
+    { id: "ex-s1", name: "Leo Lopez", age: "5", familyId: "ex-f1", level: 1, skills: S(["l1s0", "l1s1"], ["l1s2"]), notes: "Nervous about getting his face wet. Loves the diving rings." },
+    { id: "ex-s2", name: "Ada Okafor", age: "8", familyId: "ex-f2", level: 3, skills: S(["l1s0", "l1s1", "l1s2", "l1s3", "l2s0", "l2s1", "l2s2", "l2s3", "l3s0", "l3s2"], ["l3s1"]), notes: "Very competitive, motivated by races." },
+    { id: "ex-s3", name: "Sam Okafor", age: "6", familyId: "ex-f2", level: 2, skills: S(["l1s0", "l1s1", "l1s2", "l1s3", "l2s2"], ["l2s0", "l2s1"]), notes: "Copies his big sister. Gets cold quickly." },
+    { id: "ex-s4", name: "Mira Shah", age: "7", familyId: "ex-f3", level: 2, skills: S(["l1s0", "l1s1", "l1s2", "l1s3", "l2s0", "l2s1", "l2s2", "l2s3"]), notes: "Ready to move up." },
+    { id: "ex-s5", name: "Noah Becker", age: "10", familyId: "ex-f4", level: 4, skills: S(["l1s0", "l1s1", "l1s2", "l1s3", "l2s0", "l2s1", "l2s2", "l2s3", "l3s0", "l3s1", "l3s2", "l3s3", "l4s0", "l4s3"], ["l4s1", "l4s2"]), notes: "Wants to join swim team next year." },
+    { id: "ex-s6", name: "Zara Grant", age: "4", familyId: "ex-f5", level: 1, skills: S(["l1s0"], ["l1s1", "l1s3"]), notes: "First summer of lessons." },
+    { id: "ex-s7", name: "Ethan Nguyen", age: "9", familyId: "ex-f6", level: 3, skills: S(["l1s0", "l1s1", "l1s2", "l1s3", "l2s0", "l2s1", "l2s2", "l2s3", "l3s2", "l3s3"], ["l3s0", "l3s1"]), notes: "" },
+  ];
+  const plan = [
+    ["ex-s1", 0, "09:00"], ["ex-s1", 3, "09:00"], ["ex-s2", 0, "10:00"], ["ex-s3", 0, "10:30"], ["ex-s2", 2, "10:00"], ["ex-s3", 2, "10:30"],
+    ["ex-s4", 1, "11:00"], ["ex-s5", 1, "16:00"], ["ex-s5", 4, "16:00"], ["ex-s6", 2, "15:00"], ["ex-s6", 4, "15:00"], ["ex-s7", 3, "16:30"], ["ex-s4", 4, "11:00"],
+  ];
+  const notes = {
+    "ex-s1": ["Blew bubbles for 5 seconds, smiled the whole time.", "Put his chin and mouth in the water. Big step!"],
+    "ex-s2": ["Front crawl arms looking strong for 5 meters.", "Started side breathing with a noodle."],
+    "ex-s3": ["Kicked the whole width with a kickboard.", "Floated on his back for 5 seconds with a little help."],
+    "ex-s4": ["Rolled front to back on her own, twice.", "Floated on her back for 12 seconds alone. Ready for Level 3."],
+    "ex-s5": ["Dove in from sitting, clean entry.", "Backstroke getting straighter, needs to keep hips up."],
+    "ex-s6": ["Walked in from the steps by herself.", "Floated on front holding my hands."],
+    "ex-s7": ["Treaded water 30 seconds without stopping."],
+  };
+  const lessons = []; const seen = {}; let n = 0;
+  for (const [sid, day, time] of plan) {
+    for (const week of [0, 7, 14]) {
+      const date = d(day + week); const past = new Date(mon.getTime() + (day + week) * 86400000).getTime() < t;
+      const i = (seen[sid + week] = (seen[sid + week] ?? -1) + 1);
+      lessons.push({ id: `ex-l${++n}`, swimmerId: sid, date, time, length: 30, status: past ? "done" : "booked", note: past && week === 0 ? (notes[sid][i] || "") : "" });
+    }
+  }
+  const updates = [{ id: "ex-u1", swimmerId: "ex-s4", status: "sent", text: "Hi Priya, Mira had a great week! She rolled from front to back on her own and floated on her back for 12 seconds. She's ready to start Level 3. – Clare", createdAt: t - 86400000 }];
+  const tag = (arr) => arr.map((x) => ({ createdAt: t, ...x, example: true }));
+  return { families: tag(families), swimmers: tag(swimmers), lessons: tag(lessons), updates: tag(updates) };
+}
+/*END SEED*/
+function exampleBooking(now, lessons) {
+  const taken = new Set(lessons.map((l) => l.date + l.time)), slots = [];
+  for (let i = 1; i <= 12; i++) {
+    const d = addDays(now, i); if (d.getDay() === 0 || d.getDay() === 6) continue;
+    for (const time of ["09:30", "11:30", "15:30", "17:00"]) if (!taken.has(ymd(d) + time)) slots.push({ id: newId(), date: ymd(d), time, length: 30, status: "open", example: true });
+  }
+  const asks = [
+    { i: 1, parent_name: "Jenna Park (example)", phone: "555-0110", email: "jenna@example.com", child_name: "Lily Park", child_age: "6", note: "Lily is a little nervous about deep water." },
+    { i: 6, parent_name: "Dan Okafor (example)", phone: "555-0102", email: "", child_name: "Sam Okafor", child_age: "6", note: "Could Sam add a lesson this week?" },
+  ];
+  const requests = asks.filter((a) => slots[a.i]).map(({ i, ...a }) => {
+    const sl = slots[i]; sl.status = "held";
+    return { id: newId(), slot_id: sl.id, slot_date: sl.date, slot_time: sl.time, slot_length: sl.length, status: "pending", lesson_id: null, example: true, created_at: new Date(now.getTime() - (i + 1) * 3600000).toISOString(), ...a };
+  });
+  return { slots, requests };
+}
+async function clearExampleBooking() {
+  if (sb) { await remote(sb.from("booking_requests").delete().eq("example", true)); await remote(sb.from("slots").delete().eq("example", true)); }
+  state.requests = state.requests.filter((r) => !r.example); state.slots = state.slots.filter((x) => !x.example);
+}
+async function writeExampleBooking(now, lessons) {
+  await clearExampleBooking();
+  const b = exampleBooking(now, lessons);
+  if (sb) { await remote(sb.from("slots").insert(b.slots)); await remote(sb.from("booking_requests").insert(b.requests)); }
+  state.slots.push(...b.slots); state.requests.push(...b.requests); render();
+}
+async function writeExamples() {
+  const now = new Date(), ex = exampleData(now);
+  for (const col of ["families", "swimmers", "lessons", "updates"]) await store.setMany(col, ex[col]);
+  await writeExampleBooking(now, ex.lessons);
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", async (e) => {
+  const tab = e.target.closest("[data-tab]"); if (tab) { state.tab = tab.dataset.tab; state.q = ""; try { sessionStorage.setItem("swim-tab", state.tab); } catch (err) {} render(); return; }
+  const el = e.target.closest("[data-act]"); if (!el) return;
+  const a = el.dataset.act, id = el.dataset.id;
+  if (a === "close-scrim") { if (e.target === el) closeModal(); return; }
+  if (a === "drafts-toggle") { if (e.target.tagName === "SUMMARY") state.showDrafts = !el.open; return; }
+  if (a !== "clear-examples" && a !== "del-family" && a !== "del-swimmer" && a !== "del-lesson") state.confirm = null;
+  try {
+    switch (a) {
+      case "close": closeModal(); break;
+      case "week": state.weekChosen = true; state.week = el.dataset.d === "0" ? mondayOf(new Date()) : addDays(state.week, Number(el.dataset.d)); render(); break;
+      case "jump": state.weekChosen = true; state.week = mondayOf(parseD(el.dataset.date)); render(); break;
+      case "new-lesson": lessonModal(null, el.dataset.date); break;
+      case "lesson": lessonModal(state.lessons.find((l) => l.id === id)); break;
+      case "mark-done": closeModal(); await store.update("lessons", id, { status: "done" }); toast("Marked as taught."); break;
+      case "del-lesson": if (state.confirm !== "les") { state.confirm = "les"; el.textContent = "Click again to delete"; break; } closeModal(); await store.del("lessons", id); toast("Lesson deleted."); break;
+      case "texts": textsModal(); break;
+      case "copy-text": copy(el.dataset.msg); break;
+      case "texted": { const s = state.textedSet; s.has(el.dataset.k) ? s.delete(el.dataset.k) : s.add(el.dataset.k); el.textContent = s.has(el.dataset.k) ? "✓ Texted" : "Mark texted"; el.classList.toggle("ghost", !s.has(el.dataset.k)); break; }
+      case "new-family": familyModal(); break;
+      case "edit-family": familyModal(fam(id)); break;
+      case "del-family": {
+        if (state.confirm !== "fam") { state.confirm = "fam"; el.textContent = "Click again: delete family, swimmers and lessons"; break; }
+        closeModal(); const kids = kidsOf(id).map((k) => k.id);
+        for (const l of state.lessons.filter((l) => kids.includes(l.swimmerId))) await store.del("lessons", l.id);
+        for (const k of kids) await store.del("swimmers", k);
+        await store.del("families", id); toast("Family deleted."); break;
+      }
+      case "new-swimmer": swimmerModal(null, el.dataset.fid); break;
+      case "edit-swimmer": swimmerModal(swimmer(id)); break;
+      case "del-swimmer": {
+        if (state.confirm !== "sw") { state.confirm = "sw"; el.textContent = "Click again: delete swimmer and lessons"; break; }
+        closeModal(); for (const l of lessonsOf(id)) await store.del("lessons", l.id);
+        for (const col of ["plans", "feedback"]) for (const x of state[col].filter((y) => y.swimmerId === id)) await store.del(col, x.id);
+        await store.del("swimmers", id); toast("Swimmer deleted."); break;
+      }
+      case "open-swimmer": state.sel = id; state.tab = "progress"; state.q = ""; render(); break;
+      case "sel": state.sel = id; render(); break;
+      case "toggle-level": { const sk = el.nextElementSibling; sk.hidden = !sk.hidden; break; }
+      case "skill": {
+        const s = swimmer(id), k = el.dataset.k, cur = (s.skills || {})[k] || "no";
+        const skills = { ...(s.skills || {}), [k]: NEXT[cur] }; s.skills = skills; render();
+        await store.update("swimmers", id, { skills }); break;
+      }
+      case "level-up": { const s = swimmer(id); await store.update("swimmers", id, { level: Math.min(5, (s.level || 1) + 1) }); toast(`${first(s.name)} moved up a level.`); break; }
+      case "to-update": state.sel = id; state.tab = "updates"; state.draft = null; render(); break;
+      case "draft": {
+        const s = swimmer(id); state.busy = true; state.draft = { swimmerId: id, text: "", note: "" }; render();
+        const box = () => $("#draft-text");
+        const r = await draftFor(s, state.tone, state.extra, (text) => { if (state.draft && state.draft.swimmerId === id) { state.draft.text = text; if (box()) box().value = text; } });
+        state.busy = false; state.draft = { swimmerId: id, text: r.text, note: r.note, updateId: null }; render(); break;
+      }
+      case "copy-draft": copy(state.draft.text); break;
+      case "save-draft": case "save-sent": {
+        const st = a === "save-sent" ? "sent" : "draft", d = state.draft;
+        if (d.updateId) await store.update("updates", d.updateId, { text: d.text, status: st });
+        else await store.add("updates", { swimmerId: d.swimmerId, text: d.text, status: st });
+        state.draft = null; state.extra = ""; toast(st === "sent" ? "Saved as sent." : "Saved to drafts."); render(); break;
+      }
+      case "copy-update": copy(state.updates.find((u) => u.id === id).text); break;
+      case "sent": await store.update("updates", id, { status: "sent" }); toast("Marked as sent."); break;
+      case "sel-edit": { const u = state.updates.find((x) => x.id === id); state.sel = u.swimmerId; state.draft = { swimmerId: u.swimmerId, text: u.text, note: "Editing a saved draft.", updateId: u.id }; render(); break; }
+      case "del-update": await store.del("updates", id); toast("Deleted."); break;
+      case "plan-sel": state.planSel = id; state.planDraft = null; render(); break;
+      case "open-plan": closeModal(); state.planSel = id; state.planDraft = null; state.tab = "plans"; render(); break;
+      case "plan-draft": {
+        const l = lessonById(id), s = swimmer(l.swimmerId); state.planBusy = true; state.planDraft = { lessonId: id, text: "", note: "" }; render();
+        const r = await draftPlan(l, s, state.planFocus, (text) => { if (state.planDraft && state.planDraft.lessonId === id) { state.planDraft.text = text; const b = $("#plan-text"); if (b) b.value = text; } });
+        state.planBusy = false; state.planDraft = { lessonId: id, text: r.text, note: r.note }; render(); break;
+      }
+      case "plan-copy": copy($("#plan-text").value); break;
+      case "plan-save": {
+        const d = state.planDraft, l = lessonById(d.lessonId), s = swimmer(l.swimmerId);
+        await store.set("plans", l.id, { lessonId: l.id, swimmerId: l.swimmerId, text: d.text, createdAt: Date.now(), example: !!(s && s.example) });
+        state.planDraft = null; state.planFocus = ""; toast("Plan saved."); render(); break;
+      }
+      case "plan-del": await store.del("plans", id); state.planDraft = null; toast("Plan deleted."); render(); break;
+      case "plan-batch": runPlanBatch(); break;
+      case "stop-plan-batch": state.planBatch && state.planBatch.ctl.abort(); break;
+      case "to-video": state.sel = id; state.tab = "video"; state.q = ""; render(); break;
+      case "vfeedback": getFeedback(); break;
+      case "vconfirm": {
+        const s = swimmer(state.vid.swimmerId), skills = { ...(s.skills || {}), [el.dataset.k]: el.dataset.st };
+        s.skills = skills; render(); await store.update("swimmers", s.id, { skills }); toast(`${skillName(el.dataset.k)}: ${STATUS[el.dataset.st]}`); break;
+      }
+      case "batch": runBatch(); break;
+      case "stop-batch": state.batch && state.batch.ctl.abort(); break;
+      case "settings": settingsModal(); break;
+      case "sign-out": closeModal(); if (sb) await sb.auth.signOut(); location.reload(); break;
+      case "reload": location.reload(); break;
+      case "toggle-signup": state.signup = !state.signup; state.loginError = ""; render(); break;
+      case "add-slots": slotsModal(); break;
+      case "del-slot": await book.delSlot(id); toast("Open time removed."); break;
+      case "copy-link": copy(bookingLink()); break;
+      case "approve": { el.disabled = true; await approveRequest(state.requests.find((r) => r.id === id)); break; }
+      case "decline": declineModal(state.requests.find((r) => r.id === id)); break;
+      case "load-examples": await writeExamples(); toast("Example families loaded."); break;
+      case "reset-examples": {
+        const now = new Date(), ex = exampleData(now);
+        for (const l of state.lessons.filter((x) => x.example)) await store.del("lessons", l.id);
+        await store.setMany("lessons", ex.lessons);
+        await writeExampleBooking(now, ex.lessons);
+        state.week = mondayOf(now); render(); toast("Example lessons and open times moved to this week and next."); break;
+      }
+      case "clear-examples": {
+        if (state.confirm !== "clear") { state.confirm = "clear"; render(); break; }
+        state.confirm = null;
+        await clearExampleBooking();
+        for (const col of ["feedback", "plans", "updates", "lessons", "swimmers", "families"]) for (const x of state[col].filter((y) => y.example)) await store.del(col, x.id);
+        toast("Examples removed."); render(); break;
+      }
+    }
+  } catch (err) { console.error(err); state.busy = false; toast("Something didn't save. Check your connection and try again."); render(); }
+});
+document.addEventListener("input", (e) => {
+  if (e.target.dataset.saveNotes) { state.notesBuf[e.target.dataset.saveNotes] = e.target.value; return; }
+  const k = e.target.dataset.input; if (!k) return;
+  if (k === "q") { state.q = e.target.value; render(); }
+  else if (k === "draftText") { if (state.draft) state.draft.text = e.target.value; else state.draft = { swimmerId: state.sel, text: e.target.value, note: "" }; document.querySelectorAll('[data-act="copy-draft"],[data-act="save-draft"],[data-act="save-sent"]').forEach((b) => (b.disabled = !e.target.value)); }
+  else if (k === "planText") {
+    const lid = state.planSel;
+    if (state.planDraft && state.planDraft.lessonId === lid) state.planDraft.text = e.target.value; else state.planDraft = { lessonId: lid, text: e.target.value, note: "" };
+    const b = document.querySelector('[data-act="plan-save"]'); if (b) b.disabled = !e.target.value;
+  }
+  else state[k] = e.target.value;
+});
+document.addEventListener("change", async (e) => {
+  if (e.target.id === "vfile") { handleFiles(e.target.files); return; }
+  if (e.target.id === "vfocus") { state.vfocus = e.target.value; return; }
+  const sid = e.target.dataset.saveNotes; if (!sid) return;
+  const s = swimmer(sid); delete state.notesBuf[sid]; if (!s || s.notes === e.target.value) return;
+  s.notes = e.target.value;
+  try { await store.update("swimmers", sid, { notes: e.target.value }); toast("Notes saved."); } catch (err) { toast("Couldn't save notes."); }
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && $("#modal").innerHTML) closeModal(); });
+
+async function runBatch() {
+  const list = state.swimmers.filter(swamRecently).filter((s) => !state.updates.some((u) => u.swimmerId === s.id && u.status === "draft"));
+  if (!list.length) { toast("Everyone who swam this week already has a draft waiting."); return; }
+  const ctl = new AbortController(); state.batch = { done: 0, total: list.length, ctl }; render();
+  let failed = 0;
+  for (const s of list) {
+    if (ctl.signal.aborted) break;
+    try {
+      const r = await draftFor(s, "text", "", null, ctl.signal);
+      if (r.failed) failed++;
+      await store.add("updates", { swimmerId: s.id, text: r.text, status: "draft" });
+      if (r.failed === "rate_limited" || r.failed === "not_granted") break;
+    } catch (e) { break; }
+    state.batch.done++; render();
+  }
+  const done = state.batch.done; state.batch = null; state.showDrafts = true; render();
+  toast(failed ? `Drafted ${done}. ${failed} used a simple template because the AI wasn't available.` : `Drafted ${done} update${done === 1 ? "" : "s"}. Review them below.`);
+}
+
+/* ---------- start ---------- */
+document.addEventListener("submit", async (e) => {
+  if (e.target.id !== "login-form") return;
+  e.preventDefault();
+  const email = $("#login-email").value.trim(), password = $("#login-pass").value;
+  $("#login-go").disabled = true; state.loginError = "";
+  try {
+    const res = state.signup ? await sb.auth.signUp({ email, password }) : await sb.auth.signInWithPassword({ email, password });
+    if (res.error) { state.loginError = res.error.message || "That didn't work. Check your email and password."; render(); return; }
+    if (!res.data.session) { state.signup = false; state.loginError = "Check your email for a confirmation link, then come back here and sign in."; render(); return; }
+    await startCloud();
+  } catch (err) { state.loginError = "Couldn't reach the server. Check your internet connection."; render(); }
+});
+function pickWeek() {
+  if (state.weekChosen) return; const days = [...Array(7)].map((_, i) => ymd(addDays(state.week, i)));
+  if (!state.lessons.some((l) => l.date >= days[0] && l.date <= days[6])) { const nx = state.lessons.filter((l) => l.date >= days[0]).sort(byTime)[0]; if (nx) state.week = mondayOf(parseD(nx.date)); }
+}
+async function startCloud() {
+  state.mode = "loading"; render();
+  try {
+    const { data: u } = await sb.auth.getUser(); state.email = u && u.user ? u.user.email : "";
+    const { data: ok, error } = await sb.rpc("is_coach");
+    if (error) throw error;
+    if (ok !== true) { state.mode = "notcoach"; render(); return; }
+    await loadAll(); pickWeek();
+    state.mode = "cloud"; render();
+    if (!state.settings.coach) settingsModal();
+    setInterval(refreshBooking, 60000);
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refreshBooking(); });
+  } catch (err) { console.error(err); state.mode = "error"; state.loadError = "Check your internet connection, then try again."; render(); }
+}
+try { const t = sessionStorage.getItem("swim-tab"); if (t) state.tab = t; } catch (e) {}
+render();
+(async () => {
+  if (!configured || !window.supabase) {
+    state.mode = "local";
+    const now = new Date(), ex = exampleData(now);
+    Object.assign(state, ex, exampleBooking(now, ex.lessons));
+    state.settings = { ...state.settings, coach: "Clare" };
+    pickWeek(); render(); return;
+  }
+  sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey);
+  const { data } = await sb.auth.getSession();
+  if (data && data.session) await startCloud(); else { state.mode = "signedout"; render(); }
+})();
+</script>
+</body>
+</html>
