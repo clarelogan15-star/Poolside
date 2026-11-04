@@ -721,7 +721,7 @@ function settingsModal() {
     <div class="two"><label class="f">Your name (signs texts and updates)<input id="set-coach" name="coach" value="${esc(state.settings.coach || "")}" placeholder="Clare"></label>
     <label class="f">Business name<input id="set-biz" name="business" value="${esc(state.settings.business || "")}" placeholder="e.g. Clare's Swim School"></label></div>
     <label class="f">About me (shown on your booking page)<textarea id="set-about" name="about" rows="5" maxlength="1500" placeholder="e.g. I'm a swimmer at Duke and have taught kids ages 3 to 12 every summer since 2023. Lessons are one-on-one and focus on water confidence first.">${esc(state.settings.about || "")}</textarea></label>
-    <label class="f">Prices (shown on your booking page)<textarea id="set-prices" name="prices" rows="3" maxlength="1000" placeholder="e.g. 30-minute lesson: $40&#10;4-lesson package: $150">${esc(state.settings.prices || "")}</textarea></label>
+    <label class="f">Prices (shown on your booking page)<textarea id="set-prices" name="prices" rows="3" maxlength="1000" placeholder="Type prices, or paste a table from a spreadsheet or Notes (columns separated by tabs or |)">${esc(state.settings.prices || "")}</textarea></label>
     <p class="muted" style="margin:0;font-size:13px">Parents see your names, About me and Prices on your booking page. Leave a box blank to hide it.</p>
     <div class="acts">${state.mode === "cloud" ? '<button type="button" class="btn ghost left" data-act="sign-out">Sign out</button>' : ""}<button type="button" class="btn ghost" data-act="close">Cancel</button><button class="btn primary">Save</button></div>`);
   $("#mform").onsubmit = async (e) => {
