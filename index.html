@@ -710,9 +710,19 @@ async function declineRequest(r, reopen) {
   const msg = `Hi ${first(r.parent_name)}, thanks for asking about ${longDay(r.slot_date)} at ${fmtTime(r.slot_time)} for ${first(r.child_name)}. I'm sorry, that time doesn't work after all. Please pick another time on my booking page: ${bookingLink()}\n– ${coachName()}`;
   replyModal("Declined", r, msg, reopen ? "That time is open again for other parents." : "That time stays closed.");
 }
+// Opens the phone's Messages app with the number and text filled in. The coach still taps Send there.
+function smsHref(phone, msg) {
+  const num = String(phone || "").replace(/[^\d+]/g, "");
+  const ios = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+  return `sms:${num}${ios ? "&" : "?"}body=${encodeURIComponent(msg)}`;
+}
+function smsBtn(phone, msg, cls = "btn small primary") {
+  return String(phone || "").replace(/\D/g, "").length >= 7 ? `<a class="${cls}" href="${esc(smsHref(phone, msg))}">Open in Messages</a>` : "";
+}
 function replyModal(title, r, msg, note) {
   openModal(`<h2>${esc(title)}</h2>${note ? `<p class="muted" style="margin:0">${esc(note)}</p>` : ""}
-    <div class="textcard"><header><b>Text to ${esc(r.parent_name)} <span class="muted" style="user-select:all">${esc(r.phone)}</span></b><button type="button" class="btn small" data-act="copy-text" data-msg="${esc(msg)}">Copy</button></header><pre>${esc(msg)}</pre></div>
+    <div class="textcard"><header><b>Text to ${esc(r.parent_name)} <span class="muted" style="user-select:all">${esc(r.phone)}</span></b><span class="row">${smsBtn(r.phone, msg)}<button type="button" class="btn small" data-act="copy-text" data-msg="${esc(msg)}">Copy</button></span></header><pre>${esc(msg)}</pre>
+      <p class="muted" style="margin:0;font-size:13px">Poolside doesn't send texts itself. "Open in Messages" opens the text ready to go; tap Send there.</p></div>
     <div class="acts"><button type="button" class="btn primary" data-act="close">Done</button></div>`);
   $("#mform").onsubmit = (e) => { e.preventDefault(); closeModal(); };
 }
@@ -1141,7 +1151,7 @@ function textsModal() {
     const msg = `Hi ${first(f?.parent) || "there"}! Here ${items.length === 1 ? "is" : "are"} ${names.join(" & ")}'s swim lesson${items.length === 1 ? "" : "s"} for the week of ${fmtDay(days[0], { month: "short", day: "numeric" })}:\n${lines}\nReply YES to confirm, or let me know if anything needs to change. See you at the pool!\n– ${state.settings.coach || "Coach"}`;
     const key = fid + days[0];
     return `<div class="textcard"><header><b>${esc(f?.parent || "Family")}${f?.phone ? ` <span class="muted" style="user-select:all">${esc(f.phone)}</span>` : ""}</b>
-      <span class="row"><button type="button" class="btn small" data-act="copy-text" data-msg="${esc(msg)}">Copy</button><button type="button" class="btn small ${sentSet.has(key) ? "" : "ghost"}" data-act="texted" data-k="${key}">${sentSet.has(key) ? "✓ Texted" : "Mark texted"}</button></span></header><pre>${esc(msg)}</pre></div>`;
+      <span class="row">${f?.phone ? smsBtn(f.phone, msg) : ""}<button type="button" class="btn small" data-act="copy-text" data-msg="${esc(msg)}">Copy</button><button type="button" class="btn small ${sentSet.has(key) ? "" : "ghost"}" data-act="texted" data-k="${key}">${sentSet.has(key) ? "✓ Texted" : "Mark texted"}</button></span></header><pre>${esc(msg)}</pre></div>`;
   });
   openModal(`<h2>Schedule texts for this week</h2><p class="muted" style="margin:0">One message per family with all of their lesson times. Copy each one into your texting app. ${cards.length} ${cards.length === 1 ? "family" : "families"}.</p>${cards.join("")}<div class="acts"><button type="button" class="btn primary" data-act="close">Done</button></div>`);
   $("#mform").onsubmit = (e) => { e.preventDefault(); closeModal(); };
