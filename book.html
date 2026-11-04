@@ -42,7 +42,9 @@ main { padding-block: 20px 60px; display: grid; gap: 14px; }
 .time:hover { background: var(--accent-soft); }
 .time[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; }
-.about { gap: 8px; } .about p { margin: 0; }
+.about { gap: 8px; } .about .me { width: 100%; height: auto; border-radius: 10px; display: block; }
+.abouttext { display: grid; gap: 8px; align-content: start; }
+@media (min-width: 640px) { .about { grid-template-columns: 220px 1fr; gap: 20px; align-items: start; } } .about p { margin: 0; }
 .picked { background: var(--accent-soft); border-radius: 10px; padding: 10px 12px; font-weight: 700; }
 label { display: grid; gap: 4px; font-size: 14px; font-weight: 700; color: var(--muted); }
 input, textarea { font-weight: 400; color: var(--ink); padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); width: 100%; font-size: 16px; }
@@ -111,7 +113,7 @@ function render() {
   const days = [...new Set(state.slots.map((x) => x.date))].sort();
   const p = state.slots.find((x) => x.id === state.picked);
   const f = state.form;
-  const about = state.about ? `<section class="card about"><h2>About ${esc(state.coach || "me")}</h2>${state.about.split(/\n\s*\n/).map((para) => `<p>${esc(para.trim()).replace(/\n/g, "<br>")}</p>`).join("")}</section>` : "";
+  const about = state.about ? `<section class="card about"><img class="me" src="photo.jpg" alt="${esc(state.coach || "Your coach")} at the U.S. Olympic Team Trials" width="596" height="799" onerror="this.remove()"><div class="abouttext"><h2>About ${esc(state.coach || "me")}</h2>${state.about.split(/\n\s*\n/).map((para) => `<p>${esc(para.trim()).replace(/\n/g, "<br>")}</p>`).join("")}</div></section>` : "";
   $("#app").innerHTML = `${demo}${about}
     <p class="intro">Pick a time that works for you. ${esc(state.coach || "Your coach")} will text you to confirm.</p>
     ${state.error && !p ? `<p class="warn">${esc(state.error)}</p>` : ""}
