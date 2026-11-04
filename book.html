@@ -42,6 +42,7 @@ main { padding-block: 20px 60px; display: grid; gap: 14px; }
 .time:hover { background: var(--accent-soft); }
 .time[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; }
+.about { gap: 8px; } .about p { margin: 0; }
 .picked { background: var(--accent-soft); border-radius: 10px; padding: 10px 12px; font-weight: 700; }
 label { display: grid; gap: 4px; font-size: 14px; font-weight: 700; color: var(--muted); }
 input, textarea { font-weight: 400; color: var(--ink); padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); width: 100%; font-size: 16px; }
@@ -75,7 +76,7 @@ const longDay = (s) => parseD(s).toLocaleDateString(undefined, { weekday: "long"
 const CFG = window.POOLSIDE_CONFIG || {};
 const configured = /^https:\/\//.test(CFG.supabaseUrl || "") && String(CFG.supabaseAnonKey || "").length > 20;
 const sb = configured && window.supabase ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: false } }) : null;
-const state = { coach: "", business: "", slots: [], picked: null, sent: null, error: "", busy: false, form: {} };
+const state = { coach: "", business: "", about: "", slots: [], picked: null, sent: null, error: "", busy: false, form: {} };
 
 function demoSlots() {
   const out = [], now = new Date();
@@ -87,11 +88,11 @@ function demoSlots() {
   return out;
 }
 async function load() {
-  if (!sb) { Object.assign(state, { coach: "Clare", business: "", slots: demoSlots() }); return; }
+  if (!sb) { Object.assign(state, { coach: "Clare", business: "", about: "Hi! I swim at Duke and have taught summer swim lessons since 2023. Lessons are one-on-one and start with feeling safe and confident in the water.", slots: demoSlots() }); return; }
   const { data, error } = await sb.rpc("get_booking_page");
   if (error) throw error;
   const today = ymd(new Date());
-  Object.assign(state, { coach: data.coach || "", business: data.business || "", slots: (data.slots || []).filter((x) => x.date >= today) });
+  Object.assign(state, { coach: data.coach || "", business: data.business || "", about: data.about || "", slots: (data.slots || []).filter((x) => x.date >= today) });
 }
 
 function render() {
@@ -110,7 +111,8 @@ function render() {
   const days = [...new Set(state.slots.map((x) => x.date))].sort();
   const p = state.slots.find((x) => x.id === state.picked);
   const f = state.form;
-  $("#app").innerHTML = `${demo}
+  const about = state.about ? `<section class="card about"><h2>About ${esc(state.coach || "me")}</h2>${state.about.split(/\n\s*\n/).map((para) => `<p>${esc(para.trim()).replace(/\n/g, "<br>")}</p>`).join("")}</section>` : "";
+  $("#app").innerHTML = `${demo}${about}
     <p class="intro">Pick a time that works for you. ${esc(state.coach || "Your coach")} will text you to confirm.</p>
     ${state.error && !p ? `<p class="warn">${esc(state.error)}</p>` : ""}
     ${days.length ? days.map((d) => `<section class="day"><h2>${esc(longDay(d))}</h2><div class="times">${state.slots.filter((x) => x.date === d).sort((a, b) => a.time.localeCompare(b.time)).map((x) =>

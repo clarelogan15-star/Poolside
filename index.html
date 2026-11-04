@@ -262,7 +262,7 @@ const byTime = (a, b) => (a.date + a.time).localeCompare(b.date + b.time);
 
 /* ---------- state ---------- */
 const state = {
-  tab: "schedule", families: [], swimmers: [], lessons: [], updates: [], settings: { coach: "", business: "" },
+  tab: "schedule", families: [], swimmers: [], lessons: [], updates: [], settings: { coach: "", business: "", about: "" },
   week: mondayOf(new Date()), weekChosen: false, sel: null, q: "", draft: null, mode: "loading",
   tone: "warm", extra: "", busy: false, batch: null, confirm: null, notesBuf: {},
   plans: [], feedback: [], slots: [], requests: [], signup: false, loginError: "", planSel: null, planDraft: null, planFocus: "", planBusy: false, planBatch: null, vid: null, vfocus: "",
@@ -719,11 +719,12 @@ function settingsModal() {
   openModal(`<h2>Settings</h2>${state.settings.coach ? "" : '<p style="margin:0">Welcome! Add your name and business name. Parents see them on your booking page, and they sign your texts.</p>'}
     <div class="two"><label class="f">Your name (signs texts and updates)<input id="set-coach" name="coach" value="${esc(state.settings.coach || "")}" placeholder="Clare"></label>
     <label class="f">Business name<input id="set-biz" name="business" value="${esc(state.settings.business || "")}" placeholder="e.g. Clare's Swim School"></label></div>
-    <p class="muted" style="margin:0;font-size:13px">Parents see these names on your booking page.</p>
+    <label class="f">About me (shown on your booking page)<textarea id="set-about" name="about" rows="5" maxlength="1500" placeholder="e.g. I'm a swimmer at Duke and have taught kids ages 3 to 12 every summer since 2023. Lessons are one-on-one and focus on water confidence first.">${esc(state.settings.about || "")}</textarea></label>
+    <p class="muted" style="margin:0;font-size:13px">Parents see your names and About me on your booking page. Leave About me blank to hide it.</p>
     <div class="acts">${state.mode === "cloud" ? '<button type="button" class="btn ghost left" data-act="sign-out">Sign out</button>' : ""}<button type="button" class="btn ghost" data-act="close">Cancel</button><button class="btn primary">Save</button></div>`);
   $("#mform").onsubmit = async (e) => {
     e.preventDefault(); const v = Object.fromEntries(new FormData(e.target)); closeModal();
-    try { await saveSettings({ coach: v.coach.trim(), business: v.business.trim() }); toast("Saved."); } catch (err) { toast("Couldn't save. Check your connection and try again."); }
+    try { await saveSettings({ coach: v.coach.trim(), business: v.business.trim(), about: (v.about || "").trim() }); toast("Saved."); } catch (err) { toast("Couldn't save. Check your connection and try again."); }
   };
 }
 

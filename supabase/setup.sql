@@ -69,6 +69,7 @@ language sql stable security definer set search_path = public as $$
   select jsonb_build_object(
     'coach', coalesce((select data ->> 'coach' from records where collection = 'settings' and id = 'main'), ''),
     'business', coalesce((select data ->> 'business' from records where collection = 'settings' and id = 'main'), ''),
+    'about', coalesce((select left(data ->> 'about', 2000) from records where collection = 'settings' and id = 'main'), ''),
     'slots', coalesce((
       select jsonb_agg(jsonb_build_object('id', s.id, 'date', s.date, 'time', s.time, 'length', s.length) order by s.date, s.time)
       from slots s
