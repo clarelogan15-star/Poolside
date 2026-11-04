@@ -262,7 +262,7 @@ const byTime = (a, b) => (a.date + a.time).localeCompare(b.date + b.time);
 
 /* ---------- state ---------- */
 const state = {
-  tab: "schedule", families: [], swimmers: [], lessons: [], updates: [], settings: { coach: "", business: "", about: "" },
+  tab: "schedule", families: [], swimmers: [], lessons: [], updates: [], settings: { coach: "", business: "", about: "", prices: "" },
   week: mondayOf(new Date()), weekChosen: false, sel: null, q: "", draft: null, mode: "loading",
   tone: "warm", extra: "", busy: false, batch: null, confirm: null, notesBuf: {},
   plans: [], feedback: [], slots: [], requests: [], signup: false, loginError: "", planSel: null, planDraft: null, planFocus: "", planBusy: false, planBatch: null, vid: null, vfocus: "",
@@ -461,6 +461,7 @@ function viewSchedule() {
         return `<button class="lesson ${l.status || "booked"} ${clash ? "clash" : ""}" data-act="lesson" data-id="${l.id}">
           <span class="t">${esc(fmtTime(l.time))} · ${l.length || 30} min${l.status === "done" ? " · taught" : ""}${clash ? " · double-booked" : ""}${planFor(l.id) ? " · planned" : ""}</span>
           <b>${esc(s ? s.name : "Unknown swimmer")}</b>
+          ${l.location ? `<span class="t">📍 ${esc(l.location)}</span>` : ""}
           ${s ? `<span>${lvlChip(s.level || 1)}</span>` : ""}
         </button>`; }).join("")}</div>
       <button class="addday" data-act="new-lesson" data-date="${d}">+ Book</button></section>`;
@@ -620,7 +621,7 @@ function reqCard(r) {
   return `<article class="card req">
     <div class="row" style="justify-content:space-between;align-items:center"><span class="when">${esc(longDay(r.slot_date))} at ${esc(fmtTime(r.slot_time))}</span><span class="pill sun">Waiting</span></div>
     <h3>${esc(r.child_name)}${r.child_age ? ` <span class="muted" style="font-size:14px;font-weight:400">age ${esc(r.child_age)}</span>` : ""} ${r.example ? '<span class="ex">Example</span>' : ""}</h3>
-    <div class="contact"><span>${esc(r.parent_name)} · <span class="sel">${esc(r.phone)}</span></span>${r.email ? `<span class="sel">${esc(r.email)}</span>` : ""}${r.note ? `<span class="muted">“${esc(r.note)}”</span>` : ""}
+    <div class="contact"><span>${esc(r.parent_name)} · <span class="sel">${esc(r.phone)}</span></span>${r.email ? `<span class="sel">${esc(r.email)}</span>` : ""}${r.location ? `<span>📍 ${esc(r.location)}</span>` : ""}${r.note ? `<span class="muted">“${esc(r.note)}”</span>` : ""}
       <span class="muted">${f ? `Matches a family you have: ${esc(f.parent)}` : "New family. Approving adds them to Families."}</span></div>
     <div class="row"><button class="btn primary small" data-act="approve" data-id="${r.id}">Approve</button><button class="btn small" data-act="decline" data-id="${r.id}">Decline</button></div>
   </article>`;
@@ -685,13 +686,13 @@ function coachName() { return state.settings.coach || "Coach"; }
 async function approveRequest(r) {
   const ex = !!r.example;
   let f = familyForPhone(r.phone);
-  const fid = f ? f.id : await store.add("families", { parent: r.parent_name, phone: r.phone, email: r.email || "", notes: "Booked online", example: ex });
+  const fid = f ? f.id : await store.add("families", { parent: r.parent_name, phone: r.phone, email: r.email || "", notes: "Booked online", location: r.location || "", example: ex });
   const k = state.swimmers.find((x) => x.familyId === fid && first(x.name).toLowerCase() === first(r.child_name).toLowerCase());
   const sid = k ? k.id : await store.add("swimmers", { name: r.child_name, age: r.child_age || "", familyId: fid, level: 1, skills: {}, notes: r.note ? `Parent's note when booking: ${r.note}` : "", example: ex });
-  const lid = await store.add("lessons", { swimmerId: sid, date: r.slot_date, time: r.slot_time, length: r.slot_length || 30, status: "booked", note: "", example: ex });
+  const lid = await store.add("lessons", { swimmerId: sid, date: r.slot_date, time: r.slot_time, length: r.slot_length || 30, status: "booked", note: "", location: r.location || "", example: ex });
   if (r.slot_id && state.slots.some((x) => x.id === r.slot_id)) await book.updateSlot(r.slot_id, { status: "booked" });
   await book.updateRequest(r.id, { status: "approved", lesson_id: lid });
-  const msg = `Hi ${first(r.parent_name)}! ${first(r.child_name)} is booked for a swim lesson on ${longDay(r.slot_date)} at ${fmtTime(r.slot_time)} (${r.slot_length || 30} minutes). See you at the pool!\n– ${coachName()}`;
+  const msg = `Hi ${first(r.parent_name)}! ${first(r.child_name)} is booked for a swim lesson on ${longDay(r.slot_date)} at ${fmtTime(r.slot_time)} (${r.slot_length || 30} minutes)${r.location ? ` at ${r.location}` : ""}. See you at the pool!\n– ${coachName()}`;
   replyModal("Approved", r, msg, f ? "" : `${r.parent_name} and ${first(r.child_name)} were added to Families at Level 1. You can change the level on the Progress tab.`);
 }
 async function declineRequest(r, reopen) {
@@ -720,11 +721,12 @@ function settingsModal() {
     <div class="two"><label class="f">Your name (signs texts and updates)<input id="set-coach" name="coach" value="${esc(state.settings.coach || "")}" placeholder="Clare"></label>
     <label class="f">Business name<input id="set-biz" name="business" value="${esc(state.settings.business || "")}" placeholder="e.g. Clare's Swim School"></label></div>
     <label class="f">About me (shown on your booking page)<textarea id="set-about" name="about" rows="5" maxlength="1500" placeholder="e.g. I'm a swimmer at Duke and have taught kids ages 3 to 12 every summer since 2023. Lessons are one-on-one and focus on water confidence first.">${esc(state.settings.about || "")}</textarea></label>
-    <p class="muted" style="margin:0;font-size:13px">Parents see your names and About me on your booking page. Leave About me blank to hide it.</p>
+    <label class="f">Prices (shown on your booking page)<textarea id="set-prices" name="prices" rows="3" maxlength="1000" placeholder="e.g. 30-minute lesson: $40&#10;4-lesson package: $150">${esc(state.settings.prices || "")}</textarea></label>
+    <p class="muted" style="margin:0;font-size:13px">Parents see your names, About me and Prices on your booking page. Leave a box blank to hide it.</p>
     <div class="acts">${state.mode === "cloud" ? '<button type="button" class="btn ghost left" data-act="sign-out">Sign out</button>' : ""}<button type="button" class="btn ghost" data-act="close">Cancel</button><button class="btn primary">Save</button></div>`);
   $("#mform").onsubmit = async (e) => {
     e.preventDefault(); const v = Object.fromEntries(new FormData(e.target)); closeModal();
-    try { await saveSettings({ coach: v.coach.trim(), business: v.business.trim(), about: (v.about || "").trim() }); toast("Saved."); } catch (err) { toast("Couldn't save. Check your connection and try again."); }
+    try { await saveSettings({ coach: v.coach.trim(), business: v.business.trim(), about: (v.about || "").trim(), prices: (v.prices || "").trim() }); toast("Saved."); } catch (err) { toast("Couldn't save. Check your connection and try again."); }
   };
 }
 
@@ -1191,8 +1193,8 @@ function exampleBooking(now, lessons) {
     for (const time of ["09:30", "11:30", "15:30", "17:00"]) if (!taken.has(ymd(d) + time)) slots.push({ id: newId(), date: ymd(d), time, length: 30, status: "open", example: true });
   }
   const asks = [
-    { i: 1, parent_name: "Jenna Park (example)", phone: "555-0110", email: "jenna@example.com", child_name: "Lily Park", child_age: "6", note: "Lily is a little nervous about deep water." },
-    { i: 6, parent_name: "Dan Okafor (example)", phone: "555-0102", email: "", child_name: "Sam Okafor", child_age: "6", note: "Could Sam add a lesson this week?" },
+    { i: 1, parent_name: "Jenna Park (example)", phone: "555-0110", email: "jenna@example.com", child_name: "Lily Park", child_age: "6", note: "Lily is a little nervous about deep water.", location: "Park family pool, 12 Oak Lane" },
+    { i: 6, parent_name: "Dan Okafor (example)", phone: "555-0102", email: "", child_name: "Sam Okafor", child_age: "6", note: "Could Sam add a lesson this week?", location: "Hillside community pool" },
   ];
   const requests = asks.filter((a) => slots[a.i]).map(({ i, ...a }) => {
     const sl = slots[i]; sl.status = "held";

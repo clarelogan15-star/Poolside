@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0a7285">
+<meta name="theme-color" content="#e2effc">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
 <title>Book a Swim Lesson</title>
@@ -12,15 +12,17 @@
 <style>
 /* Layout: one narrow column for phones; a day list of time buttons, then a short form. */
 :root {
-  --bg: #edf4f4; --surface: #ffffff; --sunk: #e3eeef; --ink: #0f2b33; --muted: #52707a; --line: #cfe0e2;
-  --accent: #0a7285; --accent-ink: #ffffff; --accent-soft: #d6eef1; --rope: #dd4f37; --good: #23845a; --good-soft: #d9f0e4;
+  --bg: #fdf2f6; --surface: #ffffff; --sunk: #fbe4ec; --ink: #1d2a44; --muted: #5d6882; --line: #f1d3de;
+  --head: #e2effc; --sky: #a9d2f5; --pink: #f6b3c8; --pink-soft: #fde4ec;
+  --accent: #2f6db0; --accent-ink: #ffffff; --accent-soft: #dcebfb; --warn: #b8324c; --good: #23845a; --good-soft: #d9f0e4;
   --display: "Familjen Grotesk", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --body: "Figtree", "Segoe UI", system-ui, sans-serif;
   padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 @media (prefers-color-scheme: dark) { :root {
-  --bg: #0b1a1f; --surface: #11252c; --sunk: #0e2027; --ink: #e2eff1; --muted: #8eabb2; --line: #23424b;
-  --accent: #43c3d5; --accent-ink: #032329; --accent-soft: #143a43; --rope: #f07a62; --good: #5cc98b; --good-soft: #15372a; color-scheme: dark } }
+  --bg: #1b1720; --surface: #25202b; --sunk: #2c2532; --ink: #f1eaf2; --muted: #b3a8b8; --line: #3d3443;
+  --head: #1d2a3b; --sky: #7fb6e6; --pink: #e993b0; --pink-soft: #3a2531;
+  --accent: #8cc4f5; --accent-ink: #0b1d33; --accent-soft: #1e3450; --warn: #f28aa0; --good: #5cc98b; --good-soft: #15372a; color-scheme: dark } }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; }
@@ -28,11 +30,11 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--b
 h1, h2, h3 { font-family: var(--display); line-height: 1.15; margin: 0; text-wrap: balance; }
 button, input, textarea { font: inherit; color: inherit; }
 .wrap { max-width: 640px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-header { background: var(--surface); border-bottom: 1px solid var(--line); }
+header { background: var(--head); border-bottom: 1px solid var(--line); }
 header .wrap { padding-block: 22px 18px; display: grid; gap: 4px; }
 header h1 { font-size: 28px; letter-spacing: -0.01em; }
 header p { margin: 0; color: var(--muted); }
-.rope { height: 6px; background: repeating-linear-gradient(90deg, var(--rope) 0 14px, #ffffff 14px 18px, var(--accent) 18px 32px, #ffffff 32px 36px); opacity: .9; }
+.rope { height: 6px; background: repeating-linear-gradient(90deg, var(--pink) 0 14px, #ffffff 14px 18px, var(--sky) 18px 32px, #ffffff 32px 36px); }
 main { padding-block: 20px 60px; display: grid; gap: 14px; }
 .intro { margin: 0; color: var(--muted); }
 .day { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px 14px; display: grid; gap: 10px; }
@@ -42,7 +44,8 @@ main { padding-block: 20px 60px; display: grid; gap: 14px; }
 .time:hover { background: var(--accent-soft); }
 .time[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; }
-.about { gap: 8px; } .about .me { width: 100%; height: auto; border-radius: 10px; display: block; }
+.about { gap: 8px; border-top: 4px solid var(--pink); }
+.prices { gap: 8px; background: var(--pink-soft); border-color: var(--pink); } .prices p { margin: 0; } .about .me { width: 100%; height: auto; border-radius: 10px; display: block; }
 .abouttext { display: grid; gap: 8px; align-content: start; }
 @media (min-width: 640px) { .about { grid-template-columns: 220px 1fr; gap: 20px; align-items: start; } } .about p { margin: 0; }
 .picked { background: var(--accent-soft); border-radius: 10px; padding: 10px 12px; font-weight: 700; }
@@ -53,7 +56,7 @@ input, textarea { font-weight: 400; color: var(--ink); padding: 12px; border: 1p
 .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .btn:disabled { opacity: .6; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; }
-.warn { color: var(--rope); font-weight: 700; margin: 0; }
+.warn { color: var(--warn); font-weight: 700; margin: 0; }
 .muted { color: var(--muted); }
 .done { text-align: center; padding: 28px 18px; }
 .done .tick { width: 56px; height: 56px; border-radius: 50%; background: var(--good-soft); color: var(--good); display: grid; place-items: center; font-size: 28px; margin: 0 auto 12px; font-weight: 700; }
@@ -78,7 +81,7 @@ const longDay = (s) => parseD(s).toLocaleDateString(undefined, { weekday: "long"
 const CFG = window.POOLSIDE_CONFIG || {};
 const configured = /^https:\/\//.test(CFG.supabaseUrl || "") && String(CFG.supabaseAnonKey || "").length > 20;
 const sb = configured && window.supabase ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: false } }) : null;
-const state = { coach: "", business: "", about: "", slots: [], picked: null, sent: null, error: "", busy: false, form: {} };
+const state = { coach: "", business: "", about: "", prices: "", slots: [], picked: null, sent: null, error: "", busy: false, form: {} };
 
 function demoSlots() {
   const out = [], now = new Date();
@@ -90,11 +93,11 @@ function demoSlots() {
   return out;
 }
 async function load() {
-  if (!sb) { Object.assign(state, { coach: "Clare", business: "", about: "Hi! I swim at Duke and have taught summer swim lessons since 2023. Lessons are one-on-one and start with feeling safe and confident in the water.", slots: demoSlots() }); return; }
+  if (!sb) { Object.assign(state, { coach: "Clare", business: "", prices: "30-minute lesson: $40\n4-lesson package: $150", about: "Hi! I swim at Duke and have taught summer swim lessons since 2023. Lessons are one-on-one and start with feeling safe and confident in the water.", slots: demoSlots() }); return; }
   const { data, error } = await sb.rpc("get_booking_page");
   if (error) throw error;
   const today = ymd(new Date());
-  Object.assign(state, { coach: data.coach || "", business: data.business || "", about: data.about || "", slots: (data.slots || []).filter((x) => x.date >= today) });
+  Object.assign(state, { coach: data.coach || "", business: data.business || "", about: data.about || "", prices: data.prices || "", slots: (data.slots || []).filter((x) => x.date >= today) });
 }
 
 function render() {
@@ -114,8 +117,10 @@ function render() {
   const p = state.slots.find((x) => x.id === state.picked);
   const f = state.form;
   const about = state.about ? `<section class="card about"><img class="me" src="photo.jpg" alt="${esc(state.coach || "Your coach")} at the U.S. Olympic Team Trials" width="596" height="799" onerror="this.remove()"><div class="abouttext"><h2>About ${esc(state.coach || "me")}</h2>${state.about.split(/\n\s*\n/).map((para) => `<p>${esc(para.trim()).replace(/\n/g, "<br>")}</p>`).join("")}</div></section>` : "";
-  $("#app").innerHTML = `${demo}${about}
-    <p class="intro">Pick a time that works for you. ${esc(state.coach || "Your coach")} will text you to confirm.</p>
+  const paras = (t) => t.split(/\n\s*\n/).map((para) => `<p>${esc(para.trim()).replace(/\n/g, "<br>")}</p>`).join("");
+  const prices = state.prices ? `<section class="card prices"><h2>Prices</h2>${paras(state.prices)}</section>` : "";
+  $("#app").innerHTML = `${demo}${about}${prices}
+    <p class="intro">Choose a time. ${esc(state.coach || "Your coach")} will text you to confirm.</p>
     ${state.error && !p ? `<p class="warn">${esc(state.error)}</p>` : ""}
     ${days.length ? days.map((d) => `<section class="day"><h2>${esc(longDay(d))}</h2><div class="times">${state.slots.filter((x) => x.date === d).sort((a, b) => a.time.localeCompare(b.time)).map((x) =>
       `<button class="time" data-act="pick" data-id="${esc(x.id)}" aria-pressed="${x.id === state.picked}">${esc(fmtTime(x.time))}</button>`).join("")}</div></section>`).join("")
@@ -127,6 +132,7 @@ function render() {
       <label>Email (optional)<input id="f-email" name="email" type="email" autocomplete="email" maxlength="200" value="${esc(f.email || "")}"></label>
       <div class="two"><label>Swimmer's name<input id="f-child" name="child" required maxlength="100" value="${esc(f.child || "")}"></label>
       <label>Age<input id="f-age" name="age" inputmode="numeric" maxlength="20" value="${esc(f.age || "")}"></label></div>
+      <label>Lesson location<input id="f-location" name="location" required maxlength="200" autocomplete="street-address" placeholder="Pool name or address" value="${esc(f.location || "")}"></label>
       <label>Anything ${esc(coach)} should know? (optional)<textarea id="f-note" name="note" rows="3" maxlength="1000" placeholder="Swimming experience, worries, or questions">${esc(f.note || "")}</textarea></label>
       ${state.error ? `<p class="warn">${esc(state.error)}</p>` : ""}
       <button class="btn primary" ${state.busy ? "disabled" : ""}>${state.busy ? "Sending…" : "Request this time"}</button>
@@ -151,16 +157,19 @@ document.addEventListener("submit", async (e) => {
   state.busy = true; state.error = ""; render();
   try {
     if (sb) {
-      const { error } = await sb.rpc("request_booking", { p_slot: p.id, p_parent: v.parent, p_phone: v.phone, p_email: v.email || "", p_child: v.child, p_age: v.age || "", p_note: v.note || "" });
+      const args = { p_slot: p.id, p_parent: v.parent, p_phone: v.phone, p_email: v.email || "", p_child: v.child, p_age: v.age || "", p_note: v.note || "" };
+      let { error } = await sb.rpc("request_booking", { ...args, p_location: v.location || "" });
+      // If the database hasn't been updated for locations yet, send the location inside the note instead.
+      if (error && error.code === "PGRST202") ({ error } = await sb.rpc("request_booking", { ...args, p_note: [`Location: ${v.location || ""}`, v.note || ""].filter(Boolean).join("\n") }));
       if (error) throw error;
     }
     state.sent = { child: v.child, date: p.date, time: p.time, phone: v.phone };
-    state.form = { parent: v.parent, phone: v.phone, email: v.email };
+    state.form = { parent: v.parent, phone: v.phone, email: v.email, location: v.location };
   } catch (err) {
     const code = err && err.message;
     state.error = code === "taken" ? "Sorry, someone just took that time. Please pick another one."
       : code === "too_many" ? "You already have several requests waiting. Please wait for a reply first."
-      : code === "missing_fields" ? "Please fill in your name, phone number and the swimmer's name."
+      : code === "missing_fields" ? "Please fill in your name, phone number, the swimmer's name and the lesson location."
       : "That didn't go through. Check your connection and try again.";
     if (code === "taken") { state.picked = null; await reload(true); }
   }

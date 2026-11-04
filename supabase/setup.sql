@@ -54,11 +54,13 @@ create table if not exists booking_requests (
   child_name text not null,
   child_age text not null default '',
   note text not null default '',
+  location text not null default '',
   status text not null default 'pending' check (status in ('pending', 'approved', 'declined')),
   lesson_id text,
   example boolean not null default false,
   created_at timestamptz not null default now()
 );
+alter table booking_requests add column if not exists location text not null default '';
 alter table booking_requests enable row level security;
 drop policy if exists coach_all on booking_requests;
 create policy coach_all on booking_requests for all to authenticated using (is_coach()) with check (is_coach());
@@ -69,6 +71,7 @@ language sql stable security definer set search_path = public as $$
   select jsonb_build_object(
     'coach', coalesce((select data ->> 'coach' from records where collection = 'settings' and id = 'main'), ''),
     'business', coalesce((select data ->> 'business' from records where collection = 'settings' and id = 'main'), ''),
+    'prices', coalesce((select left(data ->> 'prices', 1500) from records where collection = 'settings' and id = 'main'), ''),
     'about', coalesce((select left(data ->> 'about', 2000) from records where collection = 'settings' and id = 'main'), ''),
     'slots', coalesce((
       select jsonb_agg(jsonb_build_object('id', s.id, 'date', s.date, 'time', s.time, 'length', s.length) order by s.date, s.time)
@@ -79,8 +82,9 @@ language sql stable security definer set search_path = public as $$
 $$;
 
 -- A parent asks for one open time. The time is held until the coach approves or declines.
+drop function if exists request_booking(uuid, text, text, text, text, text, text);
 create or replace function request_booking(
-  p_slot uuid, p_parent text, p_phone text, p_email text, p_child text, p_age text, p_note text
+  p_slot uuid, p_parent text, p_phone text, p_email text, p_child text, p_age text, p_note text, p_location text default ''
 ) returns text
 language plpgsql security definer set search_path = public as $$
 declare s slots%rowtype;
@@ -89,7 +93,7 @@ begin
     raise exception 'missing_fields';
   end if;
   if length(p_parent) > 100 or length(p_child) > 100 or length(p_phone) > 30 or length(coalesce(p_email, '')) > 200
-     or length(coalesce(p_age, '')) > 20 or length(coalesce(p_note, '')) > 1000 then
+     or length(coalesce(p_age, '')) > 20 or length(coalesce(p_note, '')) > 1000 or length(coalesce(p_location, '')) > 200 then
     raise exception 'too_long';
   end if;
   if (select count(*) from booking_requests where status = 'pending' and regexp_replace(phone, '\D', '', 'g') = regexp_replace(p_phone, '\D', '', 'g')) >= 10 then
@@ -99,17 +103,17 @@ begin
   if not found then
     raise exception 'taken';
   end if;
-  insert into booking_requests (slot_id, slot_date, slot_time, slot_length, parent_name, phone, email, child_name, child_age, note)
-  values (s.id, s.date, s.time, s.length, trim(p_parent), trim(p_phone), trim(coalesce(p_email, '')), trim(p_child), trim(coalesce(p_age, '')), trim(coalesce(p_note, '')));
+  insert into booking_requests (slot_id, slot_date, slot_time, slot_length, parent_name, phone, email, child_name, child_age, note, location)
+  values (s.id, s.date, s.time, s.length, trim(p_parent), trim(p_phone), trim(coalesce(p_email, '')), trim(p_child), trim(coalesce(p_age, '')), trim(coalesce(p_note, '')), trim(coalesce(p_location, '')));
   return 'ok';
 end;
 $$;
 
 revoke all on function get_booking_page() from public;
-revoke all on function request_booking(uuid, text, text, text, text, text, text) from public;
+revoke all on function request_booking(uuid, text, text, text, text, text, text, text) from public;
 revoke all on function is_coach() from public;
 grant execute on function get_booking_page() to anon, authenticated;
-grant execute on function request_booking(uuid, text, text, text, text, text, text) to anon, authenticated;
+grant execute on function request_booking(uuid, text, text, text, text, text, text, text) to anon, authenticated;
 grant execute on function is_coach() to authenticated;
 
 -- CHANGE THIS to the email you will use to sign in to Poolside.
