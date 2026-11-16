@@ -268,7 +268,7 @@ const state = {
   tab: "schedule", families: [], swimmers: [], lessons: [], updates: [], settings: { coach: "", business: "", about: "", prices: "", venmo: "", zelle: "" },
   week: mondayOf(new Date()), weekChosen: false, sel: null, q: "", draft: null, mode: "loading",
   tone: "warm", extra: "", busy: false, batch: null, confirm: null, notesBuf: {},
-  plans: [], feedback: [], slots: [], requests: [], signup: false, loginError: "", planSel: null, planDraft: null, planFocus: "", planBusy: false, planBatch: null, vid: null, vfocus: "",
+  plans: [], feedback: [], slots: [], requests: [], signup: false, loginError: "", account: null, demoChosen: false, planSel: null, planDraft: null, planFocus: "", planBusy: false, planBatch: null, vid: null, vfocus: "",
 };
 let db = null, sample = null, sampleTried = false;
 
@@ -381,6 +381,7 @@ function makeSample() {
       throw { code, message: String(error.message || code) };
     }
     if (!data || typeof data.text !== "string") throw { code: "busy" };
+    if (state.account && typeof state.account.ai_left === "number") state.account.ai_left = Math.max(0, state.account.ai_left - 1);
     return data.text;
   }
   const fn = async (prompt, opts = {}) => { const text = await call(prompt, opts, false); if (opts.onText) opts.onText({ text, delta: text }); return { text, truncated: false }; };
@@ -421,7 +422,13 @@ function render() {
 
 function examplesNotice() {
   let out = "";
-  if (state.mode === "local") out += `<div class="notice"><span>Demo mode: this copy isn't connected to your database yet, so you're seeing example data and nothing is saved. It switches over once the setup guide is finished.</span></div>`;
+  if (state.mode === "local") out += state.demoChosen
+    ? `<div class="notice"><span>Quick look: made-up example data. Nothing is saved and the AI buttons are turned off here. Create a free account to try the AI features.</span><button class="btn small" data-act="leave-demo">Create an account</button></div>`
+    : `<div class="notice"><span>Demo mode: this copy isn't connected to your database yet, so you're seeing example data and nothing is saved. It switches over once the setup guide is finished.</span></div>`;
+  if (state.mode === "cloud" && isGuest()) {
+    const left = state.account.ai_left;
+    out += `<div class="notice"><span>Welcome! This is your own private practice space. Only you can see it, and the families in it are made up. ${left == null ? "" : `AI tries left today: <b>${left}</b>.`}</span></div>`;
+  }
   const hasEx = state.families.some((f) => f.example) || state.slots.some((x) => x.example);
   if (state.mode === "cloud" && hasEx) out += `<div class="notice"><span>Anything marked <span class="ex">Example</span> is made-up practice data. Try things out, then remove it before adding your real families.</span><button class="btn small" data-act="reset-examples">Move example dates to this week</button><button class="btn small" data-act="clear-examples">${state.confirm === "clear" ? "Click again to remove" : "Remove examples"}</button></div>`;
   if (state.mode === "cloud" && !state.families.length) out += `<div class="notice"><span>No families yet. Add your first family on the Families tab, or load a few made-up families to practice with.</span><button class="btn small" data-act="load-examples">Load example families</button></div>`;
@@ -607,6 +614,8 @@ function viewLogin() {
       <button class="btn primary" id="login-go">${state.signup ? "Create account" : "Sign in"}</button>
     </form>
     <button class="btn ghost small" data-act="toggle-signup">${state.signup ? "I already have an account" : "First time here? Create your coach account"}</button>
+    <p class="muted" style="margin:14px 0 0">Trying Poolside out? Create an account with any email and password. You get your own private space with made-up families to play with.</p>
+    <button class="btn ghost small" data-act="try-demo">Just look around (no account, AI off)</button>
   </div>`;
 }
 function viewNotCoach() {
@@ -617,7 +626,11 @@ function viewNotCoach() {
 
 /* ---------- booking: open times and parent requests ---------- */
 const digits = (p) => String(p || "").replace(/\D/g, "").slice(-10);
-const bookingLink = () => { try { return new URL("book.html", location.href).href; } catch (e) { return "book.html"; } };
+const bookingLink = () => {
+  // Classmates' accounts get their own booking page: book.html?c=<their account>. The original coach keeps the plain link.
+  const q = state.account && state.account.main === false && state.account.id ? `?c=${state.account.id}` : "";
+  try { return new URL("book.html" + q, location.href).href; } catch (e) { return "book.html" + q; }
+};
 const familyForPhone = (phone) => (digits(phone) ? state.families.find((f) => digits(f.phone) === digits(phone)) : null);
 function reqCard(r) {
   const f = familyForPhone(r.phone);
@@ -639,7 +652,7 @@ function viewBooking() {
   return `<div class="bar"><h2>Booking</h2><button class="btn primary" data-act="add-slots">Add open times</button></div>
   <div class="sharebox"><b>Your booking page</b><span class="muted">Text this link to parents. They see only your open times, never other families, and they don't need an account.</span>
     <code>${esc(bookingLink())}</code>
-    <div class="row"><button class="btn small" data-act="copy-link">Copy link</button><a class="btn small" href="book.html" target="_blank" rel="noopener">Open booking page</a></div></div>
+    <div class="row"><button class="btn small" data-act="copy-link">Copy link</button><a class="btn small" href="${esc(bookingLink())}" target="_blank" rel="noopener">Open booking page</a></div></div>
   <h3 class="section-h">Requests waiting <small>${pend.length ? `${pend.length} to answer` : "none right now"}</small></h3>
   ${pend.length ? `<div class="reqs">${pend.map(reqCard).join("")}</div>` : '<p class="muted" style="margin:0">When a parent picks a time, it shows up here for you to approve.</p>'}
   <h3 class="section-h">Open times <small>${count("open")} open · ${count("held")} requested · ${count("booked")} booked</small></h3>
@@ -764,7 +777,7 @@ function upcomingLessons(days = 14) {
 }
 function errNote(e) {
   return e && e.code === "rate_limited" ? "Claude is busy right now. Wait a minute and try again."
-    : e && e.code === "not_granted" ? "You're signed out, or this account isn't the coach account. Sign in again."
+    : e && e.code === "not_granted" ? (isGuest() ? "This account has used today's AI tries (guest accounts get a few a day to keep costs down). Try again tomorrow." : "You're signed out, or this account isn't the coach account. Sign in again.")
     : e && (e.code === "no_key" || e.code === "bad_key") ? "The Anthropic key isn't set up correctly in Supabase. Check the setup guide."
     : e && e.code === "offline" ? "Couldn't reach the AI. Check your internet connection."
     : e && e.code === "refusal" ? "Claude declined this one."
@@ -1331,6 +1344,8 @@ document.addEventListener("click", async (e) => {
       case "sign-out": closeModal(); if (sb) await sb.auth.signOut(); location.reload(); break;
       case "reload": location.reload(); break;
       case "toggle-signup": state.signup = !state.signup; state.loginError = ""; render(); break;
+      case "try-demo": startLocal(true); break;
+      case "leave-demo": location.reload(); break;
       case "add-slots": slotsModal(); break;
       case "del-slot": await book.delSlot(id); toast("Open time removed."); break;
       case "copy-link": copy(bookingLink()); break;
@@ -1416,26 +1431,37 @@ async function startCloud() {
   state.mode = "loading"; render();
   try {
     const { data: u } = await sb.auth.getUser(); state.email = u && u.user ? u.user.email : "";
-    const { data: ok, error } = await sb.rpc("is_coach");
-    if (error) throw error;
-    if (ok !== true) { state.mode = "notcoach"; render(); return; }
-    await loadAll(); pickWeek();
+    const acct = await sb.rpc("my_account");
+    if (acct.error) {
+      // The database hasn't had update 3 yet: only the original coach can use it.
+      const { data: ok, error } = await sb.rpc("is_coach");
+      if (error) throw error;
+      if (ok !== true) { state.mode = "notcoach"; render(); return; }
+      state.account = { main: true };
+    } else state.account = acct.data || { main: true };
+    await loadAll();
+    // A brand-new guest account starts with made-up families so there's something to try right away.
+    const empty = !state.settings.coach && COLS.every((c) => !state[c].length) && !state.slots.length && !state.requests.length;
+    if (state.account.main === false && empty) { try { await writeExamples(); } catch (e) { console.error(e); } }
+    pickWeek();
     state.mode = "cloud"; render();
     if (!state.settings.coach) settingsModal();
     setInterval(refreshBooking, 60000);
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refreshBooking(); });
   } catch (err) { console.error(err); state.mode = "error"; state.loadError = "Check your internet connection, then try again."; render(); }
 }
+const isGuest = () => state.mode === "cloud" && !!state.account && state.account.main === false;
+function startLocal(chosen) {
+  sb = null; state.mode = "local"; state.demoChosen = chosen;
+  const now = new Date(), ex = exampleData(now);
+  Object.assign(state, ex, exampleBooking(now, ex.lessons));
+  state.settings = { ...state.settings, coach: "Clare" };
+  pickWeek(); render();
+}
 try { const t = sessionStorage.getItem("swim-tab"); if (t) state.tab = t; } catch (e) {}
 render();
 (async () => {
-  if (!configured || !window.supabase) {
-    state.mode = "local";
-    const now = new Date(), ex = exampleData(now);
-    Object.assign(state, ex, exampleBooking(now, ex.lessons));
-    state.settings = { ...state.settings, coach: "Clare" };
-    pickWeek(); render(); return;
-  }
+  if (!configured || !window.supabase) { startLocal(false); return; }
   sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey);
   const { data } = await sb.auth.getSession();
   if (data && data.session) await startCloud(); else { state.mode = "signedout"; render(); }
