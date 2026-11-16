@@ -613,7 +613,7 @@ function viewLogin() {
       ${state.loginError ? `<p class="warn" style="margin:0">${esc(state.loginError)}</p>` : ""}
       <button class="btn primary" id="login-go">${state.signup ? "Create account" : "Sign in"}</button>
     </form>
-    <button class="btn ghost small" data-act="toggle-signup">${state.signup ? "I already have an account" : "First time here? Create your coach account"}</button>
+    <button class="btn ${state.signup ? "ghost" : ""} small" data-act="toggle-signup">${state.signup ? "I already have an account" : "New here? Create a free account"}</button>
     <p class="muted" style="margin:14px 0 0">Trying Poolside out? Create an account with any email and password. You get your own private space with made-up families to play with.</p>
     <button class="btn ghost small" data-act="try-demo">Just look around (no account, AI off)</button>
   </div>`;
@@ -1418,11 +1418,21 @@ document.addEventListener("submit", async (e) => {
   $("#login-go").disabled = true; state.loginError = "";
   try {
     const res = state.signup ? await sb.auth.signUp({ email, password }) : await sb.auth.signInWithPassword({ email, password });
-    if (res.error) { state.loginError = res.error.message || "That didn't work. Check your email and password."; render(); return; }
-    if (!res.data.session) { state.signup = false; state.loginError = "Check your email for a confirmation link, then come back here and sign in."; render(); return; }
+    if (res.error) { state.loginError = loginErrorText(res.error); render(); return; }
+    if (!res.data.session) { state.signup = false; state.loginError = "Check your email for a confirmation link, then come back here and sign in. (No email? The coach needs to turn off \"Confirm email\" in Supabase.)"; render(); return; }
     await startCloud();
   } catch (err) { state.loginError = "Couldn't reach the server. Check your internet connection."; render(); }
 });
+function loginErrorText(err) {
+  const m = String((err && err.message) || ""), code = String((err && err.code) || "");
+  if (!state.signup && /invalid login credentials/i.test(m)) return "That email and password don't match an account. New here? Tap \"Create a free account\" below first.";
+  if (/already registered|already exists|user_already_exists/i.test(m + code)) return "There's already an account with that email. Tap \"I already have an account\" and sign in instead.";
+  if (/invalid/i.test(m) && /email/i.test(m)) return "That email wasn't accepted. Try a normal-looking address, like yourname@gmail.com. It doesn't get any emails from Poolside.";
+  if (/signups? not allowed|signup.*disabled/i.test(m + code)) return "New accounts are turned off right now. (Coach: turn on \"Allow new users to sign up\" in Supabase.)";
+  if (/rate limit|too many/i.test(m)) return "Too many sign-ups at once. Wait a minute and try again.";
+  if (/password/i.test(m)) return "That password wasn't accepted. Use at least 8 characters.";
+  return m || "That didn't work. Check your email and password.";
+}
 function pickWeek() {
   if (state.weekChosen) return; const days = [...Array(7)].map((_, i) => ymd(addDays(state.week, i)));
   if (!state.lessons.some((l) => l.date >= days[0] && l.date <= days[6])) { const nx = state.lessons.filter((l) => l.date >= days[0]).sort(byTime)[0]; if (nx) state.week = mondayOf(parseD(nx.date)); }
